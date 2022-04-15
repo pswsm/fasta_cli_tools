@@ -1,6 +1,6 @@
 [package]
-name = "files_adn_args"
-version = "0.1.0"
+name = "fasta_cli_toolkit"
+version = "1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
