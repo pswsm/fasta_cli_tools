@@ -40,16 +40,9 @@ pub mod edit {
             }
         };
 
-        let mut cut_fasta: String = match sequence.get(start-1..end) {
+        let cut_fasta: String = match sequence.get(start-1..end) {
             Some(seq) => seq.to_string(),
             None => panic!("Out of range")
-        };
-
-        let cut_length: usize = cut_fasta.chars().count();
-        for idx in 59..=cut_length {
-            if (idx % 60) == 0 {
-                cut_fasta.insert_str(idx, "\n");
-            };
         };
 
 
