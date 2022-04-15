@@ -40,7 +40,7 @@ pub mod edit {
             }
         };
 
-        let mut cut_fasta: String = match sequence.get(start..end) {
+        let mut cut_fasta: String = match sequence.get(start-1..end) {
             Some(seq) => seq.to_string(),
             None => panic!("Out of range")
         };
