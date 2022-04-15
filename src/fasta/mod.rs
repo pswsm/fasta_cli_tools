@@ -45,9 +45,11 @@ pub mod edit {
             None => panic!("Out of range")
         };
 
-        let cut_length: usize = cut_fasta.len();
-        for idx in (0..=cut_length).step_by(60) {
-            cut_fasta.insert_str(idx+1, "\n");
+        let cut_length: usize = cut_fasta.chars().count();
+        for idx in 59..=cut_length {
+            if (idx % 60) == 0 {
+                cut_fasta.insert_str(idx, "\n");
+            };
         };
 
 
