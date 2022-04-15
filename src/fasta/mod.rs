@@ -45,7 +45,7 @@ pub mod edit {
             None => panic!("Out of range")
         };
 
-        for idx in (59..cut_fasta.len()).step_by(60) {
+        for idx in (60..cut_fasta.len()).step_by(60) {
             cut_fasta.insert_str(idx, "\n");
         };
 
