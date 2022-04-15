@@ -46,7 +46,7 @@ pub mod edit {
         };
 
         let cut_length: usize = cut_fasta.len();
-        for idx in (60..=cut_length).step_by(60) {
+        for idx in (0..=cut_length).step_by(60) {
             cut_fasta.insert_str(idx+1, "\n");
         };
 
