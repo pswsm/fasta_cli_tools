@@ -12,14 +12,15 @@ struct Args {
     cmdline: Command
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(StructOpt)]
 enum Command {
     Print(CatOptions),
     Cut(CutOptions),
-    Generate(GenerateOptions)
+    Generate(GenerateOptions),
+    Format(FormatOptions)
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(StructOpt)]
 #[structopt(name = "print file options",
             about = "Reads file, prints its content",
             rename_all = "kebab-case")]
@@ -28,7 +29,7 @@ struct CatOptions {
     file: PathBuf,
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(StructOpt)]
 #[structopt(name = "cutting options",
             about = "Cuts nucleotides from..to range",
             rename_all = "kebab-case")]
@@ -46,27 +47,41 @@ struct CutOptions {
     to: usize
 }
 
-#[derive(Debug, StructOpt)]
+#[derive(StructOpt)]
 #[structopt(name = "generation options",
             about = "Generates a fasta file long n bases",
             rename_all = "kebab-case")]
 struct GenerateOptions {
+    #[structopt(help = "Number of lines to generate. Each line has 60 bases")] 
+    length: u32,
 
     #[structopt(help = "File to write to")]
     output_file: PathBuf,
+}
 
-    #[structopt(short = "n", long = "lines", help = "Number of lines to generate. Each line has 60 bases")] 
-    length: u32,
+#[derive(StructOpt)]
+#[structopt(name = "fromat otions",
+            help = "Formats a fasta file",
+            rename_all = "kebab-case")]
+struct FormatOptions {
+    #[structopt(help = "File to format")]
+    file: PathBuf,
+
+    #[structopt(short, long = "upper", help = "If present, format to uppercase")]
+    uppercase: bool,
+
+    #[structopt(short, long = "output", help = "File to write formatted fasta.")]
+    output_file: Option<PathBuf>,
 }
 
 fn main() {
-
     let args = Args::from_args();
 
     let result = match args.cmdline {
         Command::Cut(args) => fasta::edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
         Command::Generate(args) => fasta::make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
-        Command::Print(args) => fasta::view::cat(&args.file).unwrap_or(String::from("File not found. Check the if file exists.")),
+        Command::Print(args) => fasta::view::cat(&args.file).unwrap_or(String::from("File not found")),
+        Command::Format(args) => fasta::edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
     };
 
     println!("{}", result);
