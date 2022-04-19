@@ -10,4 +10,5 @@ structopt = {version = "0.3"}
 strum = { version = "0.23", features = ["derive"] }
 strum_macros = "0.23"
 rand = "0.8.4"
+textwrap = "0.15"
 

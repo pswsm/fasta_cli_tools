@@ -19,6 +19,7 @@ pub mod edit {
     use std::path::PathBuf;
     use std::io::prelude::Write;
     use std::fs::File;
+    use textwrap::fill;
 
     pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usize) -> std::io::Result<String> {
         let text: String = match view::cat(&input_file) {
@@ -63,17 +64,9 @@ pub mod edit {
 
         let mut text_lines = text.lines();
         text_lines.next();
-        let mut sequence: String = String::from(text_lines.next().unwrap());
+        let sequence: String = String::from(text_lines.next().unwrap());
 
-        for idx in 0..=sequence.len() {
-            for n in (0..=sequence.len()).step_by(60) {
-                if idx >= 60 && idx == n {
-                    sequence.insert_str(idx, "\n");
-                };
-            };
-        };
-
-        let result = (&sequence).to_string();
+        let result = fill(&sequence, 60); 
 
         if out_file != None {
             let mut output_file = File::create(out_file.unwrap())?;
