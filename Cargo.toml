@@ -1,14 +1,12 @@
 [package]
 name = "fasta_cli_toolkit"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 structopt = {version = "0.3"}
-strum = { version = "0.23", features = ["derive"] }
-strum_macros = "0.23"
 rand = "0.8.4"
 textwrap = "0.15"
 
