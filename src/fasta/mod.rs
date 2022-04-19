@@ -26,8 +26,18 @@ pub mod edit {
             Ok(contents) => contents,
             Err(e) => panic!("Could not read file!. Error {}", e)
         };
+
         let mut text_lines = text.lines();
-        text_lines.next();
+
+        let mut original_header: String = String::new();
+        if text.chars().next() == Some('>') {
+            let og_header: &str  = match text_lines.next() {
+                Some(header) => header,
+                None => ">"
+            };
+            original_header.push_str(og_header);
+        };
+
         let mut sequence: String = String::new();
         // Skips the header and pushes sequence lines to v:sequence
         for line in text_lines {
@@ -46,15 +56,25 @@ pub mod edit {
             None => panic!("Out of range")
         };
 
+        let return_fasta: String = match format_str(cut_fasta) {
+            Ok(seq) => seq,
+            Err(e) => panic!("Cannot format. {e}")
+        };
 
-        let header: String = format!("> Original file: {}. Range: {} to {}\n", input_file.display(), start, end);
+        let header: String = format!(">Original Header {{{}}}. Original file: {}. Range: {} to {}\n", original_header, input_file.display(), start, end);
         let mut output_f = File::create(&output_file)?;
         output_f.write(header.as_bytes())?;
-        output_f.write(cut_fasta.as_bytes())?;
+        output_f.write(return_fasta.as_bytes())?;
         
         let result: String = format!("Cut from {} to {}. Read {}. Write {}", start, end, input_file.display(), output_file.display());
         Ok(result)
     }
+
+    fn format_str(sequence: String) -> std::result::Result<String, String> {
+        let result: String = fill(&sequence, 60); 
+        Ok(result)
+    }
+
 
     pub fn format(file: PathBuf, is_upper: bool, out_file: Option<PathBuf>) -> std::io::Result<String> {
         let text = match view::cat(&file) {
