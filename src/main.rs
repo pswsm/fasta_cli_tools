@@ -4,8 +4,8 @@ use structopt::StructOpt;
 mod fasta;
 
 #[derive(StructOpt)]
-#[structopt(name = "CLI fasta toolkit",
-            about = "A CLI toolkit to generate, edit and see fasta files",
+#[structopt(name = "fasta_cli_toolkit",
+            about = "A CLI toolkit to manipulate fasta files",
             rename_all = "kebab-case")]
 struct Args {
     #[structopt(subcommand)]
@@ -34,22 +34,22 @@ struct CatOptions {
             about = "Cuts nucleotides from..to range",
             rename_all = "kebab-case")]
 struct CutOptions {
-    #[structopt(short, long = "output", help = "File to write", parse(from_os_str))]
-    output_file_name: PathBuf,
-    
-    #[structopt(short, long = "input", help = "File to read")] 
-    input_file_name: PathBuf,
-
     #[structopt(help = "Position to start cutting")]
     from: usize,
     
     #[structopt(help = "Position to start cutting")]
-    to: usize
+    to: usize,
+
+    #[structopt(help = "File to read")] 
+    input_file_name: PathBuf,
+
+    #[structopt(help = "File to write")]
+    output_file_name: PathBuf,    
 }
 
 #[derive(StructOpt)]
 #[structopt(name = "generation options",
-            about = "Generates a fasta file long n bases",
+            about = "Generates a fasta file long n lines",
             rename_all = "kebab-case")]
 struct GenerateOptions {
     #[structopt(help = "Number of lines to generate. Each line has 60 bases")] 
@@ -60,17 +60,17 @@ struct GenerateOptions {
 }
 
 #[derive(StructOpt)]
-#[structopt(name = "fromat otions",
-            help = "Formats a fasta file",
+#[structopt(name = "format otions",
+            about = "Formats a fasta file",
             rename_all = "kebab-case")]
 struct FormatOptions {
     #[structopt(help = "File to format")]
     file: PathBuf,
 
-    #[structopt(short, long = "upper", help = "If present, format to uppercase")]
+    #[structopt(short, long = "upper", help = "Format to uppercase")]
     uppercase: bool,
 
-    #[structopt(short, long = "output", help = "File to write formatted fasta.")]
+    #[structopt(short, long = "output", help = "File to write formatted fasta. Optional")]
     output_file: Option<PathBuf>,
 }
 
@@ -78,10 +78,10 @@ fn main() {
     let args = Args::from_args();
 
     let result = match args.cmdline {
-        Command::Cut(args) => fasta::edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
+        Command::Cut(args)      => fasta::edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
         Command::Generate(args) => fasta::make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
-        Command::Print(args) => fasta::view::cat(&args.file).unwrap_or(String::from("File not found")),
-        Command::Format(args) => fasta::edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
+        Command::Print(args)    => fasta::view::cat(&args.file).unwrap_or(String::from("File not found")),
+        Command::Format(args)   => fasta::edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
     };
 
     println!("{}", result);
