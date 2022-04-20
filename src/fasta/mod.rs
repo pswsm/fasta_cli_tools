@@ -1,20 +1,52 @@
+pub struct Fasta {
+    header: String,
+    sequence: String
+}
+
+impl Fasta {
+    const fn new() -> Fasta {
+        Fasta { header: String::new(), sequence: String::new() }
+    }
+
+    const fn from(headr: String, seqnc: String) -> Fasta {
+        Fasta { header: headr, sequence: seqnc }
+    }
+}
+
 pub mod view {
     use std::path::Path;
     use std::fs::File;
     use std::io::prelude::Read;
     use std::io::BufReader;
 
-    pub fn cat(input_file: &Path) -> std::io::Result<String> {
+    use crate::fasta::Fasta;
+
+    pub fn cat(input_file: &Path) -> std::io::Result<Fasta> {
         let file = File::open(input_file)?;
         let mut reader = BufReader::new(file);
         let mut contents: String = String::new();
         reader.read_to_string(&mut contents)?;
-        Ok(contents)
+        let mut reader_lines = contents.lines();
+
+        let mut header: String = String::new();
+        let mut sequence: String = String::new();
+        for line in reader_lines {
+            if line.starts_with(">") {
+                header.push_str(line);
+            } else if !line.starts_with(">") {
+                sequence.push_str(line);
+            } else {
+                panic!{"Yes."};
+            };
+        };
+
+        let fasta: Fasta = Fasta::from(header, sequence);
+        Ok(fasta)
     }
 }
 
 pub mod edit {
-    use crate::fasta::view;
+    use crate::fasta::{view, Fasta};
 
     use std::path::PathBuf;
     use std::io::prelude::Write;
@@ -22,36 +54,17 @@ pub mod edit {
     use textwrap::fill;
 
     pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usize) -> std::io::Result<String> {
-        let text: String = match view::cat(&input_file) {
+        let og_fasta: Fasta = match view::cat(&input_file) {
             Ok(contents) => contents,
             Err(e) => panic!("Could not read file!. Error {}", e)
         };
 
-        let mut text_lines = text.lines();
+        let original_sequence: String = og_fasta.sequence;
+        let original_header: String = og_fasta.header;
 
-        let mut original_header: String = String::new();
-        if text.chars().next() == Some('>') {
-            let og_header: &str  = match text_lines.next() {
-                Some(header) => header,
-                None => ">"
-            };
-            original_header.push_str(og_header);
-        };
+        let seq_copy: String = original_sequence.replace("\n", "");
 
-        let mut sequence: String = String::new();
-        // Skips the header and pushes sequence lines to v:sequence
-        for line in text_lines {
-            sequence.push_str(line);
-        };
-
-        let seq_copy: String = String::from(&sequence);
-        for char in seq_copy.char_indices() {
-            if char.1.to_string() == "\n" {
-                sequence.remove(char.0);
-            }
-        };
-
-        let cut_fasta: String = match sequence.get(start-1..end) {
+        let cut_fasta: String = match seq_copy.get(start-1..end) {
             Some(seq) => seq.to_string(),
             None => panic!("Out of range")
         };
@@ -61,9 +74,9 @@ pub mod edit {
             Err(e) => panic!("Cannot format. {e}")
         };
 
-        let header: String = format!(">Original Header {{{}}}. Original file: {}. Range: {} to {}\n", original_header, input_file.display(), start, end);
+        let new_header: String = format!(">Original Header {{{}}}. Original file: {}. Range: {} to {}\n", original_header, input_file.display(), start, end);
         let mut output_f = File::create(&output_file)?;
-        output_f.write(header.as_bytes())?;
+        output_f.write(new_header.as_bytes())?;
         output_f.write(return_fasta.as_bytes())?;
         
         let result: String = format!("Cut from {} to {}. Read {}. Write {}", start, end, input_file.display(), output_file.display());
