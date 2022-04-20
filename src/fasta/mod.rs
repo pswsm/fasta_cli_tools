@@ -4,9 +4,11 @@ pub struct Fasta {
 }
 
 impl Fasta {
+    /* 
     const fn new() -> Fasta {
         Fasta { header: String::new(), sequence: String::new() }
     }
+     */
 
     const fn from(headr: String, seqnc: String) -> Fasta {
         Fasta { header: headr, sequence: seqnc }
@@ -19,14 +21,42 @@ pub mod view {
     use std::io::prelude::Read;
     use std::io::BufReader;
 
-    use crate::fasta::Fasta;
+    use crate::fasta::{Fasta, edit::format_str};
+
+    pub fn cat_as_string(input_file: &Path) -> std::io::Result<String> {
+        let file = File::open(input_file)?;
+        let mut reader = BufReader::new(file);
+        let mut contents: String = String::new();
+        reader.read_to_string(&mut contents)?;
+        let reader_lines = contents.lines();
+
+        let mut header: String = String::new();
+        let mut sequence: String = String::new();
+        for line in reader_lines {
+            if line.starts_with(">") {
+                header.push_str(line);
+            } else if !line.starts_with(">") {
+                sequence.push_str(line);
+            } else {
+                panic!{"Yes."};
+            };
+        };
+
+        let fasta: Fasta = Fasta::from(header, sequence);
+        let fasta_sequence: String = match format_str(fasta.sequence) {
+            Ok(seq) => seq,
+            Err(e) => panic!("Could not format. {}", e)
+        }; 
+        let fasta_as_string: String = format!("{}\n{}", fasta.header, fasta_sequence);
+        Ok(fasta_as_string)
+    }
 
     pub fn cat(input_file: &Path) -> std::io::Result<Fasta> {
         let file = File::open(input_file)?;
         let mut reader = BufReader::new(file);
         let mut contents: String = String::new();
         reader.read_to_string(&mut contents)?;
-        let mut reader_lines = contents.lines();
+        let reader_lines = contents.lines();
 
         let mut header: String = String::new();
         let mut sequence: String = String::new();
@@ -62,14 +92,14 @@ pub mod edit {
         let original_sequence: String = og_fasta.sequence;
         let original_header: String = og_fasta.header;
 
-        let seq_copy: String = original_sequence.replace("\n", "");
+        let sequence_copy: String = original_sequence.replace("\n", "");
 
-        let cut_fasta: String = match seq_copy.get(start-1..end) {
+        let cut_sequence: String = match sequence_copy.get(start-1..end) {
             Some(seq) => seq.to_string(),
             None => panic!("Out of range")
         };
 
-        let return_fasta: String = match format_str(cut_fasta) {
+        let new_sequence: String = match format_str(cut_sequence) {
             Ok(seq) => seq,
             Err(e) => panic!("Cannot format. {e}")
         };
@@ -77,28 +107,25 @@ pub mod edit {
         let new_header: String = format!(">Original Header {{{}}}. Original file: {}. Range: {} to {}\n", original_header, input_file.display(), start, end);
         let mut output_f = File::create(&output_file)?;
         output_f.write(new_header.as_bytes())?;
-        output_f.write(return_fasta.as_bytes())?;
+        output_f.write(new_sequence.as_bytes())?;
         
         let result: String = format!("Cut from {} to {}. Read {}. Write {}", start, end, input_file.display(), output_file.display());
         Ok(result)
     }
 
-    fn format_str(sequence: String) -> std::result::Result<String, String> {
+    pub fn format_str(sequence: String) -> std::result::Result<String, String> {
         let result: String = fill(&sequence, 60); 
         Ok(result)
     }
 
 
     pub fn format(file: PathBuf, is_upper: bool, out_file: Option<PathBuf>) -> std::io::Result<String> {
-        let text = match view::cat(&file) {
+        let fasta = match view::cat(&file) {
             Ok(contents) => contents,
             Err(e) => panic!("Could not read file. Error {}", e),
         };
 
-        let mut text_lines = text.lines();
-        text_lines.next();
-        let sequence: String = String::from(text_lines.next().unwrap());
-
+        let sequence: String = fasta.sequence;
         let result = fill(&sequence, 60); 
 
         if out_file != None {
@@ -107,12 +134,12 @@ pub mod edit {
                 output_file.write(result.to_uppercase().as_bytes())?;
             } else if !is_upper {
                 output_file.write(result.as_bytes())?;
-            }
+            };
         };
 
         if is_upper {
             return Ok(result.to_uppercase())
-        }
+        };
 
         Ok(result)
 

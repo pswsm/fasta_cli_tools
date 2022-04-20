@@ -80,7 +80,7 @@ fn main() {
     let result = match args.cmdline {
         Command::Cut(args)      => fasta::edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
         Command::Generate(args) => fasta::make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
-        Command::Print(args)    => fasta::view::cat(&args.file).unwrap_or(String::from("File not found")),
+        Command::Print(args)    => fasta::view::cat_as_string(&args.file).unwrap_or(String::from("File not found")),
         Command::Format(args)   => fasta::edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
     };
 
