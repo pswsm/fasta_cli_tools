@@ -1,5 +1,5 @@
-mod fastaOps;
-use fastaOps::{edit, view, make};
+mod fasta_ops;
+use fasta_ops::{edit, view, make};
 
 use std::path::PathBuf;
 use structopt::StructOpt;
