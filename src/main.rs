@@ -1,7 +1,8 @@
+mod fastaOps;
+use fastaOps::{edit, view, make};
+
 use std::path::PathBuf;
 use structopt::StructOpt;
-
-mod fasta;
 
 #[derive(StructOpt)]
 #[structopt(name = "fasta_cli_toolkit",
@@ -78,10 +79,10 @@ fn main() {
     let args = Args::from_args();
 
     let result = match args.cmdline {
-        Command::Cut(args)      => fasta::edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
-        Command::Generate(args) => fasta::make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
-        Command::Print(args)    => fasta::view::cat_as_string(&args.file).unwrap_or(String::from("File not found")),
-        Command::Format(args)   => fasta::edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
+        Command::Cut(args)      => edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
+        Command::Generate(args) => make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
+        Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("File not found")),
+        Command::Format(args)   => edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
     };
 
     println!("{}", result);
