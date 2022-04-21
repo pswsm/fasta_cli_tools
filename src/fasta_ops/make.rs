@@ -21,7 +21,7 @@ pub fn generate(bases: u32, file: PathBuf) -> std::io::Result<String> {
     output_file.write(header.as_bytes())?;
     output_file.write(fmt_sequence.as_bytes())?;
 
-    let result: String = format!("Generated file {} with {} bases", file.display(), bases * 60);
+    let result: String = format!("Generated file {} with {} bases", file.display(), bases);
 
     Ok(result)
 }
