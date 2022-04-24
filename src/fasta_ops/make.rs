@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::io::prelude::Write;
-use std::path::PathBuf;
 use rand::seq::SliceRandom;
 use std::{
+    fs::File,
+    path::PathBuf,
+    io::prelude::Write,
     thread,
     sync::mpsc,
     sync::mpsc::{
