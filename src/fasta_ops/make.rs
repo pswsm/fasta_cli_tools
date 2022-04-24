@@ -16,7 +16,7 @@ pub fn generate(bases: usize, file: PathBuf) -> std::io::Result<String> {
     let atcg: Vec<String> = vec![String::from("a"), String::from("t"), String::from("c"), String::from("g")];
     let header: String = format!(">randomly generated sequence of {} bases\n", bases);
     
-    let sequence: String = match spawn_threads(2, bases, atcg){
+    let sequence: String = match spawn_threads(8, bases, atcg){
         Ok(seq) => seq.join("\n"),
         Err(e) => panic!("Could not generate bases. Error: {:?}", e)
     };
