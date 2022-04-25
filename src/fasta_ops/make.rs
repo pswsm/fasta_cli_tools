@@ -9,26 +9,16 @@ use std::{
         Sender,
         Receiver
     },
-    sync::{
-        Arc,
-        Mutex,
-        MutexGuard,
-    }
-};
-use hwloc::{
-    Topology,
-    TopologyObject,
-    ObjectType,
-    CPUBIND_THREAD,
-    CpuSet
 };
 use crate::fasta_ops::edit::format_str;
 
 pub fn generate(bases: usize, file: PathBuf) -> std::io::Result<String> {
     let atcg: Vec<String> = vec![String::from("a"), String::from("t"), String::from("c"), String::from("g")];
     let header: String = format!(">randomly generated sequence of {} bases\n", bases);
-    
-    let sequence: String = match spawn_threads(8, bases, atcg){
+
+    let num_threads: usize = bases / 1000;
+
+    let sequence: String = match spawn_threads(num_threads, bases, atcg){
         Ok(seq) => seq.join("\n"),
         Err(e) => panic!("Could not generate bases. Error: {:?}", e)
     };
@@ -55,27 +45,13 @@ fn select_rnd_str(string_list: &Vec<String>) -> String {
 fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> thread::Result<Vec<String>> {
     let bases_per_thread: usize = num_bases / num_threads;
     let base_list: Vec<String> = bases;
-    let topo = Arc::new(Mutex::new(Topology::new()));
-    let pu_num = {
-        let topo_clone = topo.clone();
-        let topo_lockd = topo_clone.lock().unwrap();
-        topo_lockd.objects_with_type(&ObjectType::Core).unwrap().len()
-    };
     let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
-    let mut children: Vec<_> = Vec::new();
-    for id in 0..pu_num {
-        let child_topo = topo.clone();
+    let mut children: Vec<thread::JoinHandle<()>> = Vec::new();
+    for _ in 0..num_threads {
         let bases_per_thread_copy: usize = bases_per_thread.clone();
         let thread_tx: Sender<String> = tx.clone();
         let base_list_copy: Vec<String> = base_list.clone();
         let child = thread::spawn(move || {
-            let tid: thread::ThreadId = thread::current().id();
-            let mut locked_topo: MutexGuard<_> = match child_topo.lock() {
-                Ok(mg) => mg,
-                Err(e) => panic!("Error {}", e)
-            };
-            let bind_to: CpuSet = cpuset_for_core(&locked_topo, id).unwrap();
-            locked_topo.set_cpubind_for_thread(tid.as_u64().get(), bind_to, CPUBIND_THREAD).expect("No core found");
             let sequence: String = (0..bases_per_thread_copy).map(|_| select_rnd_str(&base_list_copy)).collect(); 
             thread_tx.send(sequence).unwrap();
         });
@@ -93,12 +69,3 @@ fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> th
 
     Ok(sequences)
 }
-
-fn cpuset_for_core(topology: &Topology, idx: usize) -> Option<CpuSet> {
-    let cores: Vec<&TopologyObject> = (*topology).objects_with_type(&ObjectType::Core).unwrap();
-    match cores.get(idx) {
-        Some(val) => val.cpuset(),
-        None => panic!("No Core found with id {}", idx)
-    }
-}
-

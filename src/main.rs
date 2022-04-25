@@ -1,5 +1,3 @@
-#![feature(thread_id_value)]
-
 mod fasta_ops;
 use fasta_ops::{edit, view, make};
 
