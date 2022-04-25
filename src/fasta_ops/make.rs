@@ -9,6 +9,16 @@ use std::{
         Sender,
         Receiver
     },
+    sync::{
+        Arc,
+        Mutex,
+    }
+};
+use hwloc::{
+    Topology,
+    ObjectType,
+    CPUBIND_THREAD,
+    CpuSet
 };
 use crate::fasta_ops::edit::format_str;
 
@@ -42,10 +52,15 @@ fn select_rnd_str(string_list: &Vec<String>) -> String {
 fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> thread::Result<Vec<String>> {
     let bases_per_thread: usize = num_bases / num_threads;
     let base_list: Vec<String> = bases;
+    let topo = Arc::new(Mutex::new(Topology::new()));
+    let pu_num: usize = {
+        let topo_clone = topo.clone();
+        let topo_lockd = topo_clone.lock().unwrap();
+        topo_lockd.objects_with_type(&ObjectType::Core).unwrap().len();
+    };
     let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
-    let mut childrens = Vec::new();
-
-    for _ in 0..num_threads {
+    let childrens = (0..pu_num).map(|i| {
+        let child_topo = topo.clone();
         let bases_per_thread_copy: usize = bases_per_thread.clone();
         let thread_tx: Sender<String> = tx.clone();
         let base_list_copy: Vec<String> = base_list.clone();
@@ -56,8 +71,7 @@ fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> th
             };
             thread_tx.send(sequence).unwrap();
         });
-        childrens.push(child)
-    };
+    });
 
     let mut sequences: Vec<String> = Vec::new();
     for _ in 0..num_threads {
@@ -70,3 +84,4 @@ fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> th
 
     Ok(sequences)
 }
+
