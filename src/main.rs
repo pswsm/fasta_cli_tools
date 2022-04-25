@@ -54,7 +54,7 @@ struct CutOptions {
             rename_all = "kebab-case")]
 struct GenerateOptions {
     #[structopt(help = "Number of lines to generate. Each line has 60 bases")] 
-    length: u32,
+    length: usize,
 
     #[structopt(help = "File to write to")]
     output_file: PathBuf,
