@@ -53,7 +53,7 @@ fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> th
     let bases_per_thread: usize = num_bases / num_threads;
     let base_list: Vec<String> = bases;
     let topo = Arc::new(Mutex::new(Topology::new()));
-    let pu_num: usize = {
+    let pu_num = {
         let topo_clone = topo.clone();
         let topo_lockd = topo_clone.lock().unwrap();
         topo_lockd.objects_with_type(&ObjectType::Core).unwrap().len();
@@ -71,7 +71,7 @@ fn spawn_threads(num_threads: usize, num_bases: usize, bases: Vec<String>) -> th
             };
             thread_tx.send(sequence).unwrap();
         });
-    });
+    }).collect();
 
     let mut sequences: Vec<String> = Vec::new();
     for _ in 0..num_threads {
