@@ -9,7 +9,7 @@ edition = "2021"
 structopt = {version = "0.3"}
 rand = "0.8.4"
 textwrap = "0.15"
-hwloc = "0.3.0"
+num_cpus  = "1.13.1"
 
 [profile.release]
 lto = true
