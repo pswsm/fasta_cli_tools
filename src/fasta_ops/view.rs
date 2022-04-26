@@ -61,5 +61,12 @@ pub fn analize(file: &Path) -> std::io::Result<Fasta> {
         Ok(seq) => seq,
         Err(e)  => panic!("Can't read file. Error: {}", e)
     };
+    let chars: Vec<char> = fasta.sequence.chars().collect();
+    let mut gc_count: usize = 0;
+    for chr in chars {
+        if chr == 'g' || chr == 'c' {
+            gc_count = gc_count + 1
+        };
+    };
     unimplemented!()
 }
