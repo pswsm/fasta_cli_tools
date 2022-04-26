@@ -13,3 +13,4 @@ num_cpus  = "1.13.1"
 
 [profile.release]
 lto = true
+panic = 'abort'
