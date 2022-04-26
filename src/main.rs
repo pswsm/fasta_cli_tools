@@ -18,7 +18,8 @@ enum Command {
     Print(CatOptions),
     Cut(CutOptions),
     Generate(GenerateOptions),
-    Format(FormatOptions)
+    Format(FormatOptions),
+    Analyze(AnalysisOptions)
 }
 
 #[derive(StructOpt)]
@@ -75,6 +76,15 @@ struct FormatOptions {
     output_file: Option<PathBuf>,
 }
 
+#[derive(StructOpt)]
+#[structopt(name = "analysis options",
+            about = "Analyzes a sequence",
+            rename_all = "kebab-case")]
+struct AnalysisOptions {
+    #[structopt(help = "File to analize")]
+    file: PathBuf,
+}
+
 fn main() {
     let args = Args::from_args();
 
@@ -83,6 +93,7 @@ fn main() {
         Command::Generate(args) => make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
         Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("File not found")),
         Command::Format(args)   => edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
+        Command::Analyze(args)  => unimplemented!() 
     };
 
     println!("{}", result);

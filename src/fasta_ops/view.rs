@@ -2,7 +2,7 @@ use std::path::Path;
 use std::fs::File;
 use std::io::prelude::Read;
 use std::io::BufReader;
-use crate::fasta_ops::{fasta::Fasta, edit::format_str};
+use crate::fasta_ops::fasta::Fasta;
 
 macro_rules! read2str {
     ($path:ident) => {
@@ -32,12 +32,7 @@ pub fn cat_as_string(file: &Path) -> std::io::Result<String> {
         };
     };
 
-    let fasta: Fasta = Fasta::from(header, sequence);
-    let fasta_sequence: String = match format_str(fasta.sequence) {
-        Ok(seq) => seq,
-        Err(e) => panic!("Could not format. {}", e)
-    }; 
-    let fasta_as_string: String = format!("{}\n{}", fasta.header, fasta_sequence);
+    let fasta_as_string: String = format!("{}\n{}", header, sequence);
     Ok(fasta_as_string)
 }
 
@@ -62,6 +57,9 @@ pub fn cat(file: &Path) -> std::io::Result<Fasta> {
 }
 
 pub fn analize(file: &Path) -> std::io::Result<Fasta> {
-    let contents = read2str!(file);
+    let fasta: Fasta = match cat(&file) {
+        Ok(seq) => seq,
+        Err(e)  => panic!("Can't read file. Error: {}", e)
+    };
     unimplemented!()
 }
