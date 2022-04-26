@@ -2,14 +2,22 @@ use std::path::Path;
 use std::fs::File;
 use std::io::prelude::Read;
 use std::io::BufReader;
-
 use crate::fasta_ops::{fasta::Fasta, edit::format_str};
 
-pub fn cat_as_string(input_file: &Path) -> std::io::Result<String> {
-    let file = File::open(input_file)?;
-    let mut reader = BufReader::new(file);
-    let mut contents: String = String::new();
-    reader.read_to_string(&mut contents)?;
+macro_rules! read2str {
+    ($path:ident) => {
+        {
+            let file: File = File::open($path)?;
+            let mut reader: BufReader<File> = BufReader::new(file);
+            let mut contents: String = String::new();
+            reader.read_to_string(&mut contents)?;
+            contents
+        }
+    };
+}
+
+pub fn cat_as_string(file: &Path) -> std::io::Result<String> {
+    let contents = read2str!(file);
     let reader_lines = contents.lines();
 
     let mut header: String = String::new();
@@ -33,11 +41,8 @@ pub fn cat_as_string(input_file: &Path) -> std::io::Result<String> {
     Ok(fasta_as_string)
 }
 
-pub fn cat(input_file: &Path) -> std::io::Result<Fasta> {
-    let file = File::open(input_file)?;
-    let mut reader = BufReader::new(file);
-    let mut contents: String = String::new();
-    reader.read_to_string(&mut contents)?;
+pub fn cat(file: &Path) -> std::io::Result<Fasta> {
+    let contents = read2str!(file);
     let reader_lines = contents.lines();
 
     let mut header: String = String::new();
@@ -48,10 +53,15 @@ pub fn cat(input_file: &Path) -> std::io::Result<Fasta> {
         } else if !line.starts_with(">") {
             sequence.push_str(line);
         } else {
-            panic!{"Yes."};
+            panic!{"This should not happen"};
         };
     };
 
     let fasta: Fasta = Fasta::from(header, sequence);
     Ok(fasta)
+}
+
+pub fn analize(file: &Path) -> std::io::Result<Fasta> {
+    let contents = read2str!(file);
+    unimplemented!()
 }
