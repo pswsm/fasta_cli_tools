@@ -50,10 +50,10 @@ struct CutOptions {
 
 #[derive(StructOpt)]
 #[structopt(name = "generation options",
-            about = "Generates a fasta file long n lines",
+            about = "Generates a fasta file of n bases",
             rename_all = "kebab-case")]
 struct GenerateOptions {
-    #[structopt(help = "Number of lines to generate. Each line has 60 bases")] 
+    #[structopt(help = "Number of bases to generate. Each line has 60 bases")] 
     length: usize,
 
     #[structopt(help = "File to write to")]
@@ -81,7 +81,7 @@ fn main() {
     let result = match args.cmdline {
         Command::Cut(args)      => edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
         Command::Generate(args) => make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
-        Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("File not found")),
+        Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("Could not print file")),
         Command::Format(args)   => edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
     };
 
