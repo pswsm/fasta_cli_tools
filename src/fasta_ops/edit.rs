@@ -1,5 +1,7 @@
-use crate::fasta_ops::fasta::Fasta;
-use crate::fasta_ops::view;
+use crate::fasta_ops::{
+    fasta::Fasta,
+    view
+};
 
 use std::path::PathBuf;
 use std::io::prelude::Write;
