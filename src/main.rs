@@ -93,7 +93,7 @@ fn main() {
         Command::Generate(args) => make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
         Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("File not found")),
         Command::Format(args)   => edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
-        Command::Analyze(args)  => unimplemented!() 
+        Command::Analyze(args)  => view::analize(&args.file).unwrap_or(String::from("Could not analyze")),
     };
 
     println!("{}", result);

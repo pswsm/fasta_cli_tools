@@ -1,7 +1,13 @@
-use std::path::Path;
-use std::fs::File;
-use std::io::prelude::Read;
-use std::io::BufReader;
+use std::{
+    path::Path,
+    fs::File,
+    io::{
+        prelude::Read,
+        BufReader
+    },
+    collections::BTreeMap,
+};
+
 use crate::fasta_ops::fasta::Fasta;
 
 macro_rules! read2str {
@@ -56,17 +62,38 @@ pub fn cat(file: &Path) -> std::io::Result<Fasta> {
     Ok(fasta)
 }
 
-pub fn analize(file: &Path) -> std::io::Result<Fasta> {
+pub fn analize(file: &Path) -> std::io::Result<String> {
     let fasta: Fasta = match cat(&file) {
         Ok(seq) => seq,
         Err(e)  => panic!("Can't read file. Error: {}", e)
     };
+    let tot_chars: usize = fasta.sequence.chars().count();
     let chars: Vec<char> = fasta.sequence.chars().collect();
-    let mut gc_count: usize = 0;
+    let mut c_count: usize = 0;
+    let mut g_count: usize = 0;
+    let mut a_count: usize = 0;
+    let mut t_count: usize = 0;
     for chr in chars {
-        if chr == 'g' || chr == 'c' {
-            gc_count = gc_count + 1
+        match chr {
+            'a' => a_count = a_count + 1,
+            't' => t_count = t_count + 1,
+            'c' => c_count = c_count + 1,
+            'g' => g_count = g_count + 1
         };
     };
-    unimplemented!()
+    let gc_pct: f32 = ((g_count + c_count) as f32 * 100_f32) / tot_chars as f32;
+    let at_pct: f32 = ((a_count + t_count) as f32 * 100_f32) / tot_chars as f32;
+
+    let data: BTreeMap<String, String> = {
+        let mut hm: BTreeMap<String, String> = BTreeMap::new();
+        hm.insert("Nucleotides".to_string(), tot_chars.to_string());
+        hm.insert("AT Count".to_string(), at_count.to_string());
+        hm.insert("AT Percent".to_string(), at_pct.to_string());
+        hm.insert("GC Count".to_string(), gc_count.to_string());
+        hm.insert("GC Percent".to_string(), gc_pct.to_string());
+        hm
+    };
+
+    let result: String = data.iter().map(|(k, v)| format!("{}:\t{}\n", k, v)).collect();
+    Ok(result)
 }
