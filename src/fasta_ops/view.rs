@@ -1,9 +1,10 @@
 use std::{
     path::Path,
     fs::File,
+    io,
     io::{
         prelude::Read,
-        BufReader
+        BufReader,
     },
     collections::BTreeMap,
 };
@@ -42,7 +43,7 @@ pub fn cat_as_string(file: &Path) -> std::io::Result<String> {
     Ok(fasta_as_string)
 }
 
-pub fn cat(file: &Path) -> std::io::Result<Fasta> {
+pub fn cat(file: &Path) -> Result<Fasta, io::Error> {
     let contents = read2str!(file);
     let reader_lines = contents.lines();
 
@@ -62,10 +63,10 @@ pub fn cat(file: &Path) -> std::io::Result<Fasta> {
     Ok(fasta)
 }
 
-pub fn analize(file: &Path) -> std::io::Result<String> {
+pub fn analize(file: &Path) -> Result<String, io::Error> {
     let fasta: Fasta = match cat(&file) {
         Ok(seq) => seq,
-        Err(e)  => panic!("Can't read file. Error: {}", e)
+        Err(e)  => panic!("Can't read file. Error: {}", e),
     };
     let tot_chars: usize = fasta.sequence.chars().count();
     let chars: Vec<char> = fasta.sequence.chars().collect();
@@ -79,7 +80,7 @@ pub fn analize(file: &Path) -> std::io::Result<String> {
             't' => t_count = t_count + 1,
             'c' => c_count = c_count + 1,
             'g' => g_count = g_count + 1,
-            _ => panic!("Non-dna related character detected.")
+            _ => return Ok("Non-dna related character detected.".to_string())
         };
     };
     let gc_pct: f32 = ((g_count + c_count) as f32 * 100_f32) / tot_chars as f32;
@@ -99,7 +100,3 @@ pub fn analize(file: &Path) -> std::io::Result<String> {
     Ok(result)
 }
 
-#[allow(dead_code)]
-fn search_hairpin(sequence: String) -> Result<String, String> {
-   unimplemented!();
-}
