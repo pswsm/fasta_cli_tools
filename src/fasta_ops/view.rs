@@ -99,6 +99,7 @@ pub fn analize(file: &Path) -> std::io::Result<String> {
     Ok(result)
 }
 
+#[allow(dead_code)]
 fn search_hairpin(sequence: String) -> Result<String, String> {
-   unimplemented!(); 
+   unimplemented!();
 }
