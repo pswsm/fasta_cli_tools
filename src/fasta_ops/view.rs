@@ -78,7 +78,8 @@ pub fn analize(file: &Path) -> std::io::Result<String> {
             'a' => a_count = a_count + 1,
             't' => t_count = t_count + 1,
             'c' => c_count = c_count + 1,
-            'g' => g_count = g_count + 1
+            'g' => g_count = g_count + 1,
+            _ => panic!("Non-dna related character detected.")
         };
     };
     let gc_pct: f32 = ((g_count + c_count) as f32 * 100_f32) / tot_chars as f32;
@@ -87,13 +88,17 @@ pub fn analize(file: &Path) -> std::io::Result<String> {
     let data: BTreeMap<String, String> = {
         let mut hm: BTreeMap<String, String> = BTreeMap::new();
         hm.insert("Nucleotides".to_string(), tot_chars.to_string());
-        hm.insert("AT Count".to_string(), at_count.to_string());
+        hm.insert("AT Count".to_string(), (a_count + t_count).to_string());
         hm.insert("AT Percent".to_string(), at_pct.to_string());
-        hm.insert("GC Count".to_string(), gc_count.to_string());
+        hm.insert("GC Count".to_string(), (c_count + g_count).to_string());
         hm.insert("GC Percent".to_string(), gc_pct.to_string());
         hm
     };
 
     let result: String = data.iter().map(|(k, v)| format!("{}:\t{}\n", k, v)).collect();
     Ok(result)
+}
+
+fn search_hairpin(sequence: String) -> Result<String, String> {
+   unimplemented!(); 
 }
