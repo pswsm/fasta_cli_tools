@@ -25,7 +25,7 @@ impl Fasta {
         String::from(format!("{}\n{}", self.header, self.sequence))
     }
 
-    pub fn complement(&self) -> String {
+    pub fn complement(&self) -> Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
         let comp_vec: Vec<String> = {
             let mut cs: Vec<&str> = Vec::new();
@@ -41,6 +41,11 @@ impl Fasta {
             cs.into_iter().map(|b| b.to_string()).collect()
         };
         let comp_sequence: String = comp_vec.into_iter().map(|b| b).collect();
-        comp_sequence
+        Fasta { header: format!("Complementary of {}", self.header.clone()), sequence: comp_sequence }
+    }
+
+    pub fn reverse(&self) -> Fasta {
+        let rev_seq: String = self.sequence.chars().rev().collect();
+        Fasta { header: format!("Reverse of {}", self.header.clone()), sequence: rev_seq }
     }
 }
