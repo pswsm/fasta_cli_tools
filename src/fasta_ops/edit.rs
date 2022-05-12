@@ -44,28 +44,20 @@ pub fn format_str(sequence: String) -> std::result::Result<String, String> {
 }
 
 
-pub fn format(file: PathBuf, is_upper: bool, out_file: Option<PathBuf>) -> std::io::Result<String> {
-    let fasta = match view::cat(&file) {
+pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> std::io::Result<String> {
+    let fasta: Fasta = match view::cat(&file) {
         Ok(contents) => contents,
         Err(e) => panic!("Could not read file. Error {}", e),
     };
-
+    let result: String = String::from("Format OK!");
     let sequence: String = fasta.sequence;
-    let result = fill(&sequence, 60); 
-
-    if out_file != None {
-        let mut output_file = File::create(out_file.unwrap())?;
-        if is_upper {
-            output_file.write(result.to_uppercase().as_bytes())?;
-        } else if !is_upper {
-            output_file.write(result.as_bytes())?;
-        };
-    };
-
+    let seq: String = fill(&sequence, 60); 
+    let mut output_file = File::create(out_file)?;
     if is_upper {
+        output_file.write(seq.to_uppercase().as_bytes())?;
         return Ok(result.to_uppercase())
+    } else {
+        output_file.write(seq.as_bytes())?;
     };
-
     Ok(result)
-
 }

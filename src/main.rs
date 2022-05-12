@@ -70,11 +70,12 @@ struct FormatOptions {
     #[structopt(help = "File to format")]
     file: PathBuf,
 
+    #[structopt(help = "File to write formatted fasta. Optional")]
+    output_file: PathBuf,
+    
     #[structopt(short, long = "upper", help = "Format to uppercase")]
     uppercase: bool,
 
-    #[structopt(short, long = "output", help = "File to write formatted fasta. Optional")]
-    output_file: Option<PathBuf>,
 }
 
 #[derive(StructOpt)]
@@ -98,7 +99,9 @@ enum FastaOperation {
             about = "Get the reverse strand from direct strand.",
             rename_all = "kebab-case")]
 struct ReverseOptions {
+    #[structopt(help = "File to read from")]
     file: PathBuf,
+    #[structopt(help = "File to write to")]
     ofile: Option<PathBuf>
 }
 
@@ -107,7 +110,9 @@ struct ReverseOptions {
             about = "Get the reverse-complementary strand from direct strand.",
             rename_all = "kebab-case")]
 struct RevCompOptions {
+    #[structopt(help = "File to read from")]
     file: PathBuf,
+    #[structopt(help = "File to write to")]
     ofile: Option<PathBuf>
 }
 
@@ -116,7 +121,9 @@ struct RevCompOptions {
             about = "Get the complementary strand from direct strand.",
             rename_all = "kebab-case")]
 struct ComplementOptions {
+    #[structopt(help = "File to read from")]
     file: PathBuf,
+    #[structopt(help = "File to write to")]
     ofile: Option<PathBuf>
 }
 
