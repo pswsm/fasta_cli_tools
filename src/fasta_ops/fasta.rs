@@ -41,11 +41,11 @@ impl Fasta {
             cs.into_iter().map(|b| b.to_string()).collect()
         };
         let comp_sequence: String = comp_vec.into_iter().map(|b| b).collect();
-        Fasta { header: format!("Complementary of {}", self.header.clone()), sequence: comp_sequence }
+        Fasta { header: format!(">Complementary of {}", self.header.clone()), sequence: comp_sequence }
     }
 
     pub fn reverse(&self) -> Fasta {
         let rev_seq: String = self.sequence.chars().rev().collect();
-        Fasta { header: format!("Reverse of {}", self.header.clone()), sequence: rev_seq }
+        Fasta { header: format!(">Reverse of {}", self.header.clone()), sequence: rev_seq }
     }
 }
