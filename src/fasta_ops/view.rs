@@ -23,7 +23,7 @@ macro_rules! read2str {
     };
 }
 
-pub fn cat_as_string(file: &Path) -> std::io::Result<String> {
+pub fn cat_as_string(file: &Path) -> io::Result<String> {
     let contents = read2str!(file);
     let reader_lines = contents.lines();
 
@@ -83,8 +83,8 @@ pub fn analize(file: &Path) -> Result<String, io::Error> {
             _ => return Ok("Non-dna related character detected.".to_string())
         };
     };
-    let gc_pct: f32 = ((g_count + c_count) as f32 * 100_f32) / tot_chars as f32;
-    let at_pct: f32 = ((a_count + t_count) as f32 * 100_f32) / tot_chars as f32;
+    let gc_pct: f64 = ((g_count + c_count) as f64 * 100_f64) / tot_chars as f64;
+    let at_pct: f64 = ((a_count + t_count) as f64 * 100_f64) / tot_chars as f64;
 
     let data: BTreeMap<String, String> = {
         let mut hm: BTreeMap<String, String> = BTreeMap::new();
