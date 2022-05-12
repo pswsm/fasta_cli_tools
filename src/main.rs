@@ -19,7 +19,8 @@ enum Command {
     Cut(CutOptions),
     Generate(GenerateOptions),
     Format(FormatOptions),
-    Analyze(AnalysisOptions)
+    Analyze(AnalysisOptions),
+    Get(FastaOperation)
 }
 
 #[derive(StructOpt)]
@@ -85,6 +86,40 @@ struct AnalysisOptions {
     file: PathBuf,
 }
 
+#[derive(StructOpt)]
+enum FastaOperation {
+    Reverse(ReverseOptions),
+    Complementary(ComplementOptions),
+    Revcomp(RevCompOptions)
+}
+
+#[derive(StructOpt)]
+#[structopt(name = "get reverse strand from given fasta",
+            about = "Get the reverse strand from direct strand.",
+            rename_all = "kebab-case")]
+struct ReverseOptions {
+    file: PathBuf,
+    ofile: Option<PathBuf>
+}
+
+#[derive(StructOpt)]
+#[structopt(name = "get reverse-complementary strand from given fasta",
+            about = "Get the reverse-complementary strand from direct strand.",
+            rename_all = "kebab-case")]
+struct RevCompOptions {
+    file: PathBuf,
+    ofile: Option<PathBuf>
+}
+
+#[derive(StructOpt)]
+#[structopt(name = "get complementary strand from given fasta",
+            about = "Get the complementary strand from direct strand.",
+            rename_all = "kebab-case")]
+struct ComplementOptions {
+    file: PathBuf,
+    ofile: Option<PathBuf>
+}
+
 fn main() {
     let args = Args::from_args();
 
@@ -94,6 +129,11 @@ fn main() {
         Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("Could not print file")),
         Command::Format(args)   => edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
         Command::Analyze(args)  => view::analize(&args.file).unwrap_or(String::from("Could not analyze")),
+        Command::Get(args) => match args {
+            FastaOperation::Reverse(fst) => make::rev(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand")),
+            FastaOperation::Complementary(fst) => make::comp(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand")),
+            FastaOperation::Revcomp(fst) => make::revcomp(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand"))
+        },
     };
 
     println!("{}", result);
