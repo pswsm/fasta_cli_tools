@@ -131,8 +131,8 @@ fn main() {
         Command::Analyze(args)  => view::analize(&args.file).unwrap_or(String::from("Could not analyze")),
         Command::Get(args) => match args {
             FastaOperation::Reverse(fst) => make::rev(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand")),
-            FastaOperation::Complementary(fst) => make::comp(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand")),
-            FastaOperation::Revcomp(fst) => make::revcomp(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand"))
+            FastaOperation::Complementary(fst) => make::comp(fst.file, fst.ofile).unwrap_or(String::from("Could not get complementary strand")),
+            FastaOperation::Revcomp(fst) => make::revcomp(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse-complementary strand"))
         },
     };
 
