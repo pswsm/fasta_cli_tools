@@ -9,7 +9,7 @@ use std::fs::File;
 use textwrap::fill;
 
 pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usize) -> std::io::Result<String> {
-    let og_fasta: Fasta = match view::cat(&input_file) {
+    let og_fasta: Fasta = match view::cat_f(&input_file) {
         Ok(contents) => contents,
         Err(e) => panic!("Could not read file!. Error {}", e)
     };
@@ -39,24 +39,25 @@ pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usi
 }
 
 pub fn format_str(sequence: String) -> std::result::Result<String, String> {
-    let result: String = fill(&sequence, 60); 
+    let strip_seq: String = sequence.replace("\n", "");
+    let result: String = fill(&strip_seq, 60); 
     Ok(result)
 }
 
-
 pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> std::io::Result<String> {
-    let fasta: Fasta = match view::cat(&file) {
+    let fasta: Fasta = match view::cat_f(&file) {
         Ok(contents) => contents,
         Err(e) => panic!("Could not read file. Error {}", e),
     };
     let result: String = String::from("Format OK!");
-    let sequence: String = fasta.sequence;
-    let seq: String = fill(&sequence, 60); 
+    let strip_seq: String = fasta.sequence.replace("\n", "");
+    let seq: String = fill(&strip_seq, 60); 
     let mut output_file = File::create(out_file)?;
     if is_upper {
+        output_file.write(fasta.header.as_bytes())?;
         output_file.write(seq.to_uppercase().as_bytes())?;
-        return Ok(result.to_uppercase())
     } else {
+        output_file.write(fasta.header.as_bytes())?;
         output_file.write(seq.as_bytes())?;
     };
     Ok(result)

@@ -22,32 +22,22 @@ pub fn generate(bases: usize, file: PathBuf) -> std::io::Result<String> {
 
     let num_threads: usize = num_cpus::get();
 
-    //println!("Spawning threads");
     let sequence: String = match generate_bases(num_threads, bases, atcg){
         Ok(seq) => seq.join("\n"),
         Err(e) => panic!("Could not generate bases. Error: {:?}", e)
     };
-    //println!("Spawning finished.");
 
-    //println!("Starting sequence formting.");
-    let fmt_sequence: String = match format_str(sequence) {
-        Ok(seq) => seq,
-        Err(e) => panic!("Could not format. Error {}", e)
-    };
-    //println!("Finished formatting");
+    let fmt_sequence: String = format_str(sequence).unwrap();
 
-    //println!("Writing file.");
     let mut output_file = File::create(&file)?;
     output_file.write(header.as_bytes())?;
     output_file.write(fmt_sequence.as_bytes())?;
-    //println!("Finish writing file");
 
     let result: String = format!("Generated file {} with {} bases", file.display(), bases);
 
     Ok(result)
 }
 
-//#[derive(Clone, Copy)]
 fn select_rnd_str(string_list: &Vec<String>) -> String {
     let selected_string: String = String::from(string_list.choose(&mut rand::thread_rng()).unwrap());
     selected_string
@@ -81,7 +71,7 @@ fn generate_bases(num_threads: usize, num_bases: usize, bases: Vec<String>) -> t
 }
 
 pub fn rev(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> {
-    let fasta: Fasta = crate::view::cat(&file)?;
+    let fasta: Fasta = crate::view::cat_f(&file)?;
     let rev_fasta: Fasta = {
         let rv: Fasta = fasta.reverse();
         let nfseq: String = rv.sequence;
@@ -98,7 +88,7 @@ pub fn rev(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> {
 }
 
 pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> {
-    let fasta: Fasta = crate::view::cat(&file)?;
+    let fasta: Fasta = crate::view::cat_f(&file)?;
     let revcomp_fasta: Fasta = {
         let rev: Fasta = fasta.reverse();
         let rvcmp: Fasta = rev.complement();
@@ -115,7 +105,7 @@ pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Erro
 }
 
 pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> {
-    let fasta: Fasta = crate::view::cat(&file)?;
+    let fasta: Fasta = crate::view::cat_f(&file)?;
     let comp_fasta: Fasta = {
         let cmp: Fasta = fasta.complement();
         let nfseq: String = cmp.sequence;
@@ -132,7 +122,7 @@ pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> 
 
 #[allow(dead_code)]
 fn rev_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> {
-    let fasta: Fasta = crate::view::cat(&file)?;
+    let fasta: Fasta = crate::view::cat_f(&file)?;
     let rev_fasta: Fasta = fasta.reverse();
     if ofile.is_some() {
         let mut output_file = File::create(&ofile.unwrap())?;
@@ -144,7 +134,7 @@ fn rev_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> {
 
 #[allow(dead_code)]
 fn revcomp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> {
-    let fasta: Fasta = crate::view::cat(&file)?;
+    let fasta: Fasta = crate::view::cat_f(&file)?;
     let revcomp_fasta: Fasta = {
         let rev: Fasta = fasta.reverse();
         rev.complement()
@@ -159,7 +149,7 @@ fn revcomp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> 
 
 #[allow(dead_code)]
 fn comp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> {
-    let fasta: Fasta = crate::view::cat(&file)?;
+    let fasta: Fasta = crate::view::cat_f(&file)?;
     let comp_fasta: Fasta = fasta.complement();
     if ofile.is_some() {
         let mut output_file = File::create(&ofile.unwrap())?;

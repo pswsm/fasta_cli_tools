@@ -133,7 +133,7 @@ fn main() {
     let result = match args.cmdline {
         Command::Cut(args)      => edit::cutting(args.input_file_name, args.output_file_name, args.from, args.to).unwrap_or(String::from("Could not cut")),
         Command::Generate(args) => make::generate(args.length, args.output_file).unwrap_or(String::from("Could not generate")),
-        Command::Print(args)    => view::cat_as_string(&args.file).unwrap_or(String::from("Could not print file")),
+        Command::Print(args)    => view::cat(&args.file).unwrap_or(String::from("Could not print file")),
         Command::Format(args)   => edit::format(args.file, args.uppercase, args.output_file).unwrap_or(String::from("Could not format")),
         Command::Analyze(args)  => view::analize(&args.file).unwrap_or(String::from("Could not analyze")),
         Command::Get(args) => match args {

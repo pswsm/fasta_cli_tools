@@ -23,7 +23,7 @@ macro_rules! read2str {
     };
 }
 
-pub fn cat_as_string(file: &Path) -> io::Result<String> {
+pub fn cat(file: &Path) -> io::Result<String> {
     let contents = read2str!(file);
     let reader_lines = contents.lines();
 
@@ -43,7 +43,7 @@ pub fn cat_as_string(file: &Path) -> io::Result<String> {
     Ok(fasta_as_string)
 }
 
-pub fn cat(file: &Path) -> Result<Fasta, io::Error> {
+pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
     let contents = read2str!(file);
     let reader_lines = contents.lines();
 
@@ -64,7 +64,7 @@ pub fn cat(file: &Path) -> Result<Fasta, io::Error> {
 }
 
 pub fn analize(file: &Path) -> Result<String, io::Error> {
-    let fasta: Fasta = match cat(&file) {
+    let fasta: Fasta = match cat_f(&file) {
         Ok(seq) => seq,
         Err(e)  => panic!("Can't read file. Error: {}", e),
     };
