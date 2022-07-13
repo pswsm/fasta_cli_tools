@@ -6,7 +6,6 @@ As of 13-05-2022 there are no checks on wether the file is actually a fasta file
 ## TODO
 I won't set any specific dates because I'm doing this on my free time.
 
-- RNA Compatibility (Currently crashes on uracil)
 - DNA to Amino acid translation
 - DNA transcrption and translation
 - Amino Acid generation
@@ -41,8 +40,9 @@ $ fasta_cli_toolkit format /path/to/input/file [/path/to/output/file]
 ### Generate
 Generates a random DNA sequence long N lines and writes it to output file.
 ```sh
-$ fasta_cli_toolkit generate N /path/to/output/file
+$ fasta_cli_toolkit generate N /path/to/output/file [-r|--rna]
 ```
+Use the `-r` or `--rna` options to generate a RNA sequence
 
 ### Analyze
 Prints a summary of the sequence:
