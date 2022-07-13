@@ -80,6 +80,7 @@ pub fn analize(file: &Path) -> Result<String, io::Error> {
             't' => t_count = t_count + 1,
             'c' => c_count = c_count + 1,
             'g' => g_count = g_count + 1,
+            'u' => t_count = t_count + 1,
             _ => return Ok("Non-dna related character detected.".to_string())
         };
     };
