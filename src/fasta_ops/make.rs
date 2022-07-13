@@ -13,11 +13,20 @@ use std::{
 };
 use crate::fasta_ops::{
     edit::format_str,
-    fasta::Fasta,
+    fasta::{
+        RNA_BASES,
+        DNA_BASES,
+        Fasta
+    },
 };
 
-pub fn generate(bases: usize, file: PathBuf) -> std::io::Result<String> {
-    let atcg: Vec<String> = vec![String::from("a"), String::from("t"), String::from("c"), String::from("g")];
+pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> std::io::Result<String> {
+    // let atcg: Vec<String> = vec![String::from("a"), String::from("t"), String::from("c"), String::from("g")];
+    let atcg: [&str; 4] = match is_rna {
+        true => RNA_BASES,
+        false => DNA_BASES
+    };
+
     let header: String = format!(">randomly generated sequence of {} bases\n", bases);
 
     let num_threads: usize = num_cpus::get();
@@ -27,11 +36,10 @@ pub fn generate(bases: usize, file: PathBuf) -> std::io::Result<String> {
         Err(e) => panic!("Could not generate bases. Error: {:?}", e)
     };
 
-    let fmt_sequence: String = format_str(sequence).unwrap();
 
     let mut output_file = File::create(&file)?;
     output_file.write(header.as_bytes())?;
-    output_file.write(fmt_sequence.as_bytes())?;
+    output_file.write(sequence.as_bytes())?;
 
     let result: String = format!("Generated file {} with {} bases", file.display(), bases);
 
@@ -43,9 +51,9 @@ fn select_rnd_str(string_list: &Vec<String>) -> String {
     selected_string
 }
 
-fn generate_bases(num_threads: usize, num_bases: usize, bases: Vec<String>) -> thread::Result<Vec<String>> {
+fn generate_bases(num_threads: usize, num_bases: usize, bases: [&str; 4]) -> thread::Result<Vec<String>> {
     let bases_per_thread: usize = num_bases / num_threads;
-    let base_list: Vec<String> = bases;
+    let base_list: Vec<String> = bases.iter().map(|b| b.to_string()).collect();
     let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
     let mut children: Vec<thread::JoinHandle<()>> = Vec::new();
     for _ in 0..num_threads {
@@ -54,8 +62,9 @@ fn generate_bases(num_threads: usize, num_bases: usize, bases: Vec<String>) -> t
         let base_list_copy: Vec<String> = base_list.clone();
         let child = thread::spawn(move || {
             //println!("Starting hread number {}", i);
-            let sequence: String = (0..bases_per_thread_copy).map(|_| select_rnd_str(&base_list_copy)).collect(); 
-            thread_tx.send(sequence).unwrap();
+            let sequence: String = (0..bases_per_thread_copy).map(|_| select_rnd_str(&base_list_copy)).collect();
+            let fmt_sequence: String = format_str(sequence).unwrap();
+            thread_tx.send(fmt_sequence).unwrap();
             //println!("Thread {} just sent its message", i);
         });
         children.push(child);
