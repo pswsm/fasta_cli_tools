@@ -1,7 +1,7 @@
 #[allow(dead_code)]
-const DNA_BASES: (&str, &str, &str, &str) = ("a", "t", "c", "g");
+pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
 #[allow(dead_code)]
-const RNA_BASES: (&str, &str, &str, &str) = ("a", "u", "c", "g");
+pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
 
 pub struct Fasta {
     pub header: String,
