@@ -1,15 +1,14 @@
 # Fasta CLI Toolkit
 A small CLI toolkit for interacting with fasta files developed in Rust.
 
-As of 13-05-2022 there are no checks on wether the file is actually a fasta file.
+As of 2022-08-29 there are no checks on wether the file is actually a fasta file, since it's a plain text file.
 
 ## TODO
 I won't set any specific dates because I'm doing this on my free time.
 
 - DNA to Amino acid translation
-- DNA transcrption and translation
+- ~DNA transcrption and translation~
 - Amino Acid generation
-Till here I think it's kinda easy
 ---------------------------
 Down here harder things, to my assesment
 - Alignement between two sequences
@@ -32,7 +31,7 @@ $ fasta_cli_toolkit cut start end /path/to/input/file /path/to/output/file
 ```
 
 ### Format
-Reads teh file into a Fasta struct, formats using TextWrap, and outputs the formatted text. If output file is provided, writes to it.
+Reads the file into a Fasta struct, formats using TextWrap, and outputs the formatted text. If output file is provided, writes it.
 ```sh
 $ fasta_cli_toolkit format /path/to/input/file [/path/to/output/file]
 ```
