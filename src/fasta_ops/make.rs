@@ -39,7 +39,7 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> std::io::Result<St
 
     let mut output_file = File::create(&file)?;
     output_file.write(header.as_bytes())?;
-    output_file.write(sequence.as_bytes())?;
+    output_file.write(format_str(sequence).unwrap().as_bytes())?;
 
     let result: String = format!("Generated file {} with {} bases", file.display(), bases);
 
