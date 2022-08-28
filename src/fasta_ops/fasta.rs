@@ -29,15 +29,28 @@ impl Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
         let comp_vec: Vec<String> = {
             let mut cs: Vec<&str> = Vec::new();
-            for b in og_seq.into_iter(){
-                match b {
-                    'a' => cs.append(&mut vec!["t"]),
-                    't' => cs.append(&mut vec!["a"]),
-                    'c' => cs.append(&mut vec!["g"]),
-                    'g' => cs.append(&mut vec!["c"]),
-                    _ => () 
+            let is_rna: bool = og_seq.contains(&'u');
+            if is_rna {
+                for b in og_seq.into_iter(){
+                    match b {
+                        'a' => cs.append(&mut vec!["u"]),
+                        'u' => cs.append(&mut vec!["a"]),
+                        'c' => cs.append(&mut vec!["g"]),
+                        'g' => cs.append(&mut vec!["c"]),
+                        _ => () 
+                    };
                 };
-            };
+            } else {
+                for b in og_seq.into_iter(){
+                    match b {
+                        'a' => cs.append(&mut vec!["t"]),
+                        't' => cs.append(&mut vec!["a"]),
+                        'c' => cs.append(&mut vec!["g"]),
+                        'g' => cs.append(&mut vec!["c"]),
+                        _ => () 
+                    };
+                };
+            }
             cs.into_iter().map(|b| b.to_string()).collect()
         };
         let comp_sequence: String = comp_vec.into_iter().map(|b| b).collect();
