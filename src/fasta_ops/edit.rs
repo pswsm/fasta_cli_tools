@@ -55,9 +55,11 @@ pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> std::io::Resu
     let mut output_file = File::create(out_file)?;
     if is_upper {
         output_file.write(fasta.header.as_bytes())?;
+        output_file.write("\n".as_bytes())?;
         output_file.write(seq.to_uppercase().as_bytes())?;
     } else {
         output_file.write(fasta.header.as_bytes())?;
+        output_file.write("\n".as_bytes())?;
         output_file.write(seq.as_bytes())?;
     };
     Ok(result)
