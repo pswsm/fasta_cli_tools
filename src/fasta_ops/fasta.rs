@@ -1,6 +1,4 @@
-#[allow(dead_code)]
 pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
-#[allow(dead_code)]
 pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
 
 pub struct Fasta {
@@ -11,8 +9,8 @@ pub struct Fasta {
 //    pub rev_comp_sequence: String
 }
 
-#[allow(dead_code)]
 impl Fasta {
+    #[allow(dead_code)]
     pub const fn new() -> Fasta {
         Fasta { header: String::new(), sequence: String::new() }
     }
