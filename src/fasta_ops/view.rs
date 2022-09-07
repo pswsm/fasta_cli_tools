@@ -1,26 +1,21 @@
 use std::{
-    path::Path,
+    collections::BTreeMap,
     fs::File,
     io,
-    io::{
-        prelude::Read,
-        BufReader,
-    },
-    collections::BTreeMap,
+    io::{prelude::Read, BufReader},
+    path::Path,
 };
 
-use crate::fasta_ops::fasta::Fasta;
+use fasta::Fasta;
 
 macro_rules! read2str {
-    ($path:ident) => {
-        {
-            let file: File = File::open($path)?;
-            let mut reader: BufReader<File> = BufReader::new(file);
-            let mut contents: String = String::new();
-            reader.read_to_string(&mut contents)?;
-            contents
-        }
-    };
+    ($path:ident) => {{
+        let file: File = File::open($path)?;
+        let mut reader: BufReader<File> = BufReader::new(file);
+        let mut contents: String = String::new();
+        reader.read_to_string(&mut contents)?;
+        contents
+    }};
 }
 
 pub fn cat(file: &Path) -> io::Result<String> {
@@ -35,9 +30,9 @@ pub fn cat(file: &Path) -> io::Result<String> {
         } else if !line.starts_with(">") {
             sequence.push_str(line);
         } else {
-            panic!{"Yes."};
+            panic! {"Yes."};
         };
-    };
+    }
 
     let fasta_as_string: String = format!("{}\n{}", header, sequence);
     Ok(fasta_as_string)
@@ -55,9 +50,9 @@ pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
         } else if !line.starts_with(">") {
             sequence.push_str(line);
         } else {
-            panic!{"This should not happen"};
+            panic! {"This should not happen"};
         };
-    };
+    }
 
     let fasta: Fasta = Fasta::from(header, sequence);
     Ok(fasta)
@@ -66,7 +61,7 @@ pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
 pub fn analize(file: &Path) -> Result<String, io::Error> {
     let fasta: Fasta = match cat_f(&file) {
         Ok(seq) => seq,
-        Err(e)  => panic!("Can't read file. Error: {}", e),
+        Err(e) => panic!("Can't read file. Error: {}", e),
     };
     let tot_chars: usize = fasta.sequence.chars().count();
     let chars: Vec<char> = fasta.sequence.chars().collect();
@@ -81,9 +76,9 @@ pub fn analize(file: &Path) -> Result<String, io::Error> {
             'u' => t_count = t_count + 1,
             'c' => c_count = c_count + 1,
             'g' => g_count = g_count + 1,
-            _ => return Ok("Non-dna related character detected.".to_string())
+            _ => return Ok("Non-dna related character detected.".to_string()),
         };
-    };
+    }
     let gc_pct: f64 = ((g_count + c_count) as f64 * 100_f64) / tot_chars as f64;
     let at_pct: f64 = ((a_count + t_count) as f64 * 100_f64) / tot_chars as f64;
 
@@ -97,7 +92,9 @@ pub fn analize(file: &Path) -> Result<String, io::Error> {
         hm
     };
 
-    let result: String = data.iter().map(|(k, v)| format!("{}:\t{}\n", k, v)).collect();
+    let result: String = data
+        .iter()
+        .map(|(k, v)| format!("{}:\t{}\n", k, v))
+        .collect();
     Ok(result)
 }
-
