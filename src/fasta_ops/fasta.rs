@@ -2,19 +2,10 @@ use std::vec::Vec;
 
 pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
 pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
-pub const AA_TABLE: Vec<dna2aa::Aminoacid> = make_aa_table();
-
-fn make_aa_table() -> Vec<dna2aa::Aminoacid> {
-    let aas: Vec<&str> = vec!(
-        "a", "c", "d", "e", "f", "g", "h", "i", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-        "u", "v", "w", "y"
-    );
-    let aa_combs: Vec<Vec<&str>> = Vec::from(vec!("gcu", "gcc", "gca", "gcg"), vec!("ugu", "ugc"), vec!("gau", "gac"), vec!("gaa", "gac"), vec!("uuu", "uuc"), vec!("ggu", "ggc", "gga", "ggg"), vec!("cau", "cac"), vec!("auu", "auc", "aua"), vec!("aaa", "aag"), vec!("uua", "uug", "cuu", "cuc", "cua", "cug"), vec!("aug"), vec!("aau", "aac") vec!("ccu", "ccc", "cca", "ccg"), vec!("caa", "cag"), vec!("cgu", "cgc", "cga", "cgg", "aga", "agg"), vec!("ucu", "ucc", "uca", "ucg", "agu", "agc"), vec!("guu", "guc", "gua", "gug"), vec!("ugg"), vec!("uau", "uac"), vec!("uaa", "uag", "uga"));
-};
 
 pub struct Fasta {
     pub header: String,
-    pub sequence: String, 
+    pub sequence: String,
 }
 
 impl Fasta {
