@@ -114,6 +114,10 @@ pub fn make_aa_table() -> Vec<Aminoacid> {
     aa_holder
 }
 
+pub fn dna2aa() -> String {
+    String::new()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{make_aa_table, Aminoacid};
