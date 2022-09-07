@@ -6,10 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-structopt = {version = "0.3"}
+structopt = { version = "0.3" }
 rand = "0.8.5"
 textwrap = "0.15"
-num_cpus  = "1.13.1"
+num_cpus = "1.13.1"
+dna2aa = { path = "dna2aa" }
 
 [profile.release]
 lto = true
