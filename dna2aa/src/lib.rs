@@ -114,8 +114,18 @@ pub fn make_aa_table() -> Vec<Aminoacid> {
     aa_holder
 }
 
-pub fn dna2aa() -> String {
-    String::new()
+pub fn dna2aa(data: fasta::Fasta) -> String {
+    let rna_sequence: String = data.sequence;
+    let aa_bases: Vec<Aminoacid> = make_aa_table();
+    let mut aa_seq = String::new()
+    for b in rna_sequence.chars() {
+        for aa in aa_bases.iter() {
+            if rna_sequence
+        }
+        if rna_sequence[b.0..b.0+3] == aa_bases[**] {
+            aa_seq = aa_seq + aa_bases[0].aa
+        }
+    }
 }
 
 #[cfg(test)]
