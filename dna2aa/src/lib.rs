@@ -1,5 +1,5 @@
 use core::fmt;
-use std::fmt::Display;
+use std::{fmt::Display, collections::HashMap};
 
 #[derive(Default)]
 pub struct Aminoacid {
@@ -25,6 +25,27 @@ impl Aminoacid {
 impl Display for Aminoacid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}:\n{:#?}", self.aa, self.codons)
+    }
+}
+
+fn make_aa_hash_table() -> HashMap<String, String> {
+    let aa_map: HashMap<String, String> = {
+        let tmp_map = HashMap::from([
+    (String::from("gcu"), String::from("a")),
+    ("gcc", "a"),
+    ("gca", "a"),
+    ("gcg", "a"),
+    ("ugu", "c"),
+    ("ugc", "c"),
+    ("gau", "d"),
+    ("gac", "d"),
+    ("gaa", "e"),
+    ("uuu", "f"),
+    ("uuc", "f"),
+    ("ggu", "g"),
+    ("ggc", "g"),
+    ("gga", "g"),
+    ])
     }
 }
 
