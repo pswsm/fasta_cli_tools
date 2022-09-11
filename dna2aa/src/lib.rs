@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{fmt::Display, collections::HashMap};
+use std::{collections::HashMap, fmt::Display};
 
 #[derive(Default)]
 pub struct Aminoacid {
@@ -29,129 +29,76 @@ impl Display for Aminoacid {
 }
 
 fn make_aa_hash_table() -> HashMap<String, String> {
-    let aa_map: HashMap<String, String> = {
-        let tmp_map = HashMap::from([
-    (String::from("gcu"), String::from("a")),
-    ("gcc", "a"),
-    ("gca", "a"),
-    ("gcg", "a"),
-    ("ugu", "c"),
-    ("ugc", "c"),
-    ("gau", "d"),
-    ("gac", "d"),
-    ("gaa", "e"),
-    ("uuu", "f"),
-    ("uuc", "f"),
-    ("ggu", "g"),
-    ("ggc", "g"),
-    ("gga", "g"),
-    ])
-    }
-}
-
-pub fn make_aa_table() -> Vec<Aminoacid> {
-    let aas: Vec<&str> = vec![
-        "a", "c", "d", "e", "f", "g", "h", "i", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v",
-        "w", "y",
-    ];
-    let aa_combs: Vec<Vec<String>> = vec![
-        vec![
-            String::from("gcu"),
-            String::from("gcc"),
-            String::from("gca"),
-            String::from("gcg"),
-        ],
-        vec![String::from("ugu"), String::from("ugc")],
-        vec![String::from("gau"), String::from("gac")],
-        vec![String::from("gaa"), String::from("gac")],
-        vec![String::from("uuu"), String::from("uuc")],
-        vec![
-            String::from("ggu"),
-            String::from("ggc"),
-            String::from("gga"),
-            String::from("ggg"),
-        ],
-        vec![String::from("cau"), String::from("cac")],
-        vec![
-            String::from("auu"),
-            String::from("auc"),
-            String::from("aua"),
-        ],
-        vec![String::from("aaa"), String::from("aag")],
-        vec![
-            String::from("uua"),
-            String::from("uug"),
-            String::from("cuu"),
-            String::from("cuc"),
-            String::from("cua"),
-            String::from("cug"),
-        ],
-        vec![String::from("aug")],
-        vec![String::from("aau"), String::from("aac")],
-        vec![
-            String::from("ccu"),
-            String::from("ccc"),
-            String::from("cca"),
-            String::from("ccg"),
-        ],
-        vec![String::from("caa"), String::from("cag")],
-        vec![
-            String::from("cgu"),
-            String::from("cgc"),
-            String::from("cga"),
-            String::from("cgg"),
-            String::from("aga"),
-            String::from("agg"),
-        ],
-        vec![
-            String::from("ucu"),
-            String::from("ucc"),
-            String::from("uca"),
-            String::from("ucg"),
-            String::from("agu"),
-            String::from("agc"),
-        ],
-        vec![
-            String::from("guu"),
-            String::from("guc"),
-            String::from("gua"),
-            String::from("gug"),
-        ],
-        vec![String::from("ugg")],
-        vec![String::from("uau"), String::from("uac")],
-        vec![
-            String::from("uaa"),
-            String::from("uag"),
-            String::from("uga"),
-        ],
-    ];
-    let aa_holder: Vec<Aminoacid> = {
-        let mut tmp_aa = vec![Aminoacid::new()];
-        for idx in 0..aas.len() {
-            tmp_aa.push(Aminoacid::from(aas[idx].to_string(), aa_combs[idx].clone()));
-        }
-        tmp_aa
-    };
-    aa_holder
+    let aa_map = HashMap::from([
+        (String::from("gcu"), String::from("a")),
+        (String::from("gcc"), String::from("a")),
+        (String::from("gca"), String::from("a")),
+        (String::from("gcg"), String::from("a")),
+        (String::from("ugu"), String::from("c")),
+        (String::from("ugc"), String::from("c")),
+        (String::from("gau"), String::from("d")),
+        (String::from("gac"), String::from("d")),
+        (String::from("gaa"), String::from("e")),
+        (String::from("uuu"), String::from("f")),
+        (String::from("uuc"), String::from("f")),
+        (String::from("ggu"), String::from("g")),
+        (String::from("ggc"), String::from("g")),
+        (String::from("gga"), String::from("g")),
+        (String::from("ggg"), String::from("g")),
+        (String::from("cau"), String::from("h")),
+        (String::from("cac"), String::from("h")),
+        (String::from("auu"), String::from("i")),
+        (String::from("auc"), String::from("i")),
+        (String::from("aua"), String::from("i")),
+        (String::from("aaa"), String::from("k")),
+        (String::from("aag"), String::from("k")),
+        (String::from("uua"), String::from("l")),
+        (String::from("uug"), String::from("l")),
+        (String::from("cuu"), String::from("l")),
+        (String::from("cuc"), String::from("l")),
+        (String::from("cua"), String::from("l")),
+        (String::from("cug"), String::from("l")),
+        (String::from("aug"), String::from("m")),
+        (String::from("ccu"), String::from("n")),
+        (String::from("ccc"), String::from("n")),
+        (String::from("cca"), String::from("n")),
+        (String::from("ccg"), String::from("n")),
+        (String::from("caa"), String::from("p")),
+        (String::from("cag"), String::from("p")),
+        (String::from("cgu"), String::from("q")),
+        (String::from("cgc"), String::from("q")),
+        (String::from("cga"), String::from("q")),
+        (String::from("cgg"), String::from("q")),
+        (String::from("aga"), String::from("q")),
+        (String::from("agg"), String::from("q")),
+        (String::from("ucu"), String::from("r")),
+        (String::from("ucg"), String::from("r")),
+        (String::from("agu"), String::from("r")),
+        (String::from("agc"), String::from("r")),
+        (String::from("guu"), String::from("t")),
+        (String::from("guc"), String::from("t")),
+        (String::from("gua"), String::from("t")),
+        (String::from("gug"), String::from("t")),
+        (String::from("ugg"), String::from("v")),
+        (String::from("uau"), String::from("w")),
+        (String::from("uac"), String::from("w")),
+        (String::from("uaa"), String::from("y")),
+        (String::from("uag"), String::from("y")),
+        (String::from("uga"), String::from("y")),
+    ]);
+    return aa_map;
 }
 
 pub fn dna2aa(data: fasta::Fasta) -> String {
     let rna_sequence: String = data.sequence;
-    let aa_bases: Vec<Aminoacid> = make_aa_table();
-    let mut aa_seq = String::new()
-    for b in rna_sequence.chars() {
-        for aa in aa_bases.iter() {
-            if rna_sequence
-        }
-        if rna_sequence[b.0..b.0+3] == aa_bases[**] {
-            aa_seq = aa_seq + aa_bases[0].aa
-        }
-    }
+    let aa_bases: HashMap<String, String> = make_aa_hash_table();
+    let mut aa_seq = String::new();
+    unimplemented!()
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{make_aa_table, Aminoacid};
+    use crate::{make_aa_hash_table, Aminoacid};
 
     #[test]
     fn test_struct() {
@@ -164,10 +111,10 @@ mod tests {
 
     #[test]
     fn test_mk_table() {
-        let table = make_aa_table();
+        let table = make_aa_hash_table();
         assert_eq!(
-            table[10].aa == String::from("m"),
-            table[10].codons == vec!(String::from("aug"))
+            table.get(&"aug".to_string()) == Some(&String::from("m")),
+            table.get(&"uga".to_string()) == Some(&String::from("y"))
         )
     }
 }
