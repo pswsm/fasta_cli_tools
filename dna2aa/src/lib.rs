@@ -90,15 +90,22 @@ fn make_aa_hash_table() -> HashMap<String, String> {
 }
 
 pub fn dna2aa(data: fasta::Fasta) -> String {
-    let rna_sequence: String = data.sequence;
+    let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| String::from(c)).collect();
     let aa_bases: HashMap<String, String> = make_aa_hash_table();
-    let mut aa_seq = String::new();
-    unimplemented!()
+    let aa_seq = {
+        let mut aa_seq_tmp: Vec<String> = Vec::new();
+        for gidx in (0..(rna_sequence_spl.len())).step_by(3) {
+            let group: String = vec![rna_sequence_spl[gidx].clone(), rna_sequence_spl[gidx+1].clone(), rna_sequence_spl[gidx+2].clone()].join("");
+            aa_seq_tmp.push(aa_bases.get(&group).unwrap().to_string());
+        };
+        aa_seq_tmp.join("")
+    };
+    return aa_seq
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{make_aa_hash_table, Aminoacid};
+    use crate::{make_aa_hash_table, Aminoacid, dna2aa};
 
     #[test]
     fn test_struct() {
@@ -116,5 +123,12 @@ mod tests {
             table.get(&"aug".to_string()) == Some(&String::from("m")),
             table.get(&"uga".to_string()) == Some(&String::from("y"))
         )
+    }
+
+    #[test]
+    fn test_dna2aa() {
+        let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augugaagu".to_string() };
+        let aa_sequence: String = dna2aa(ff);
+        assert_eq!(aa_sequence, "myr".to_string())
     }
 }
