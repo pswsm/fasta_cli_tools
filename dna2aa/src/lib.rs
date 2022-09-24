@@ -96,7 +96,7 @@ pub fn dna2aa(data: fasta::Fasta) -> String {
         let mut aa_seq_tmp: Vec<String> = Vec::new();
         for gidx in (0..(rna_sequence_spl.len())).step_by(3) {
             let group: String = vec![rna_sequence_spl[gidx].clone(), rna_sequence_spl[gidx+1].clone(), rna_sequence_spl[gidx+2].clone()].join("");
-            aa_seq_tmp.push(aa_bases.get(&group).unwrap().to_string());
+            aa_seq_tmp.push(aa_bases.get(&group).unwrap_or(&"-".to_string()).to_string());
         };
         aa_seq_tmp.join("")
     };

@@ -104,7 +104,8 @@ pub struct AnalysisOptions {
 pub enum FastaOperation {
     Reverse(StrandOptions),
     Complementary(StrandOptions),
-    Revcomp(StrandOptions)
+    Revcomp(StrandOptions),
+    Amioacids(AAOptions)
 }
 
 // ----------------
@@ -120,3 +121,13 @@ pub struct StrandOptions {
     pub ofile: Option<PathBuf>
 }
 
+#[derive(StructOpt)]
+#[structopt(name = "transform rna to aa",
+            about = "Transform a RNA sequence to an Amioacid one.",
+            rename_all = "kebab-case")]
+pub struct AAOptions {
+    #[structopt(help = "File to read from")]
+    pub file: PathBuf,
+    #[structopt(help = "File to write to")]
+    pub ofile: Option<PathBuf>
+}

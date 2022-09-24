@@ -3,6 +3,7 @@ use std::vec::Vec;
 pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
 pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
 
+#[derive(Clone)]
 pub struct Fasta {
     pub header: String,
     pub sequence: String,

@@ -164,3 +164,14 @@ fn comp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> {
     }
     Ok(comp_fasta)
 }
+
+pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> {
+    let fasta: Fasta = crate::view::cat_f(&file)?;
+    let aas: String = dna2aa::dna2aa(fasta.clone());
+    if ofile.is_some() {
+        let mut output_file = File::create(&ofile.unwrap())?;
+        output_file.write(fasta.header.as_bytes())?;
+        output_file.write(aas.as_bytes())?;
+    }
+    Ok(aas)
+}
