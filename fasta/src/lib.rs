@@ -94,4 +94,22 @@ mod tests {
             fasta.sequence == String::from("gcta")
         )
     }
+
+    #[test]
+    fn make_complement_dna() {
+        let fasta: Fasta = Fasta { header: String::from("> Test Header"), sequence: String::from("atcg") };
+        assert_eq!(
+            fasta.header == String::from("> Complementary of > Test header"),
+            fasta.sequence == String::from("tagc")
+        )
+    }
+
+    #[test]
+    fn make_complement_rna() {
+        let fasta: Fasta = Fasta { header: String::from("> Test Header"), sequence: String::from("aucg") };
+        assert_eq!(
+            fasta.header == String::from("> Complementary of > Test header"),
+            fasta.sequence == String::from("uagc")
+        )
+    }
 }
