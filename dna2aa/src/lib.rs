@@ -92,7 +92,7 @@ fn make_aa_hash_table() -> HashMap<String, String> {
 	return aa_map;
 }
 
-pub fn dna2aa(data: fasta::Fasta, uppercase: Option<bool>) -> Vec<String> {
+pub fn dna2aa(data: fasta::Fasta, uppercase: bool) -> Vec<String> {
 	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| String::from(c)).collect();
 	let aa_bases: HashMap<String, String> = make_aa_hash_table();
 	let aa_seq = {
@@ -103,15 +103,34 @@ pub fn dna2aa(data: fasta::Fasta, uppercase: Option<bool>) -> Vec<String> {
 		};
 		aa_seq_tmp.join("")
 	};
-    match uppercase.unwrap() {
-        true => return aa_seq.to_uppercase().split_inclusive("*").map(|s| String::from(s)).collect(),
-        _ => return aa_seq.split_inclusive("*").map(|s| String::from(s)).collect()
+    let result: Vec<String> = match uppercase {
+        true => aa_seq.to_uppercase().split_inclusive("*").map(|s| String::from(s)).collect(),
+        false => aa_seq.split_inclusive("*").map(|s| String::from(s)).collect()
     };
+    result
+}
+
+pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
+	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| String::from(c)).collect();
+	let aa_bases: HashMap<String, String> = make_aa_hash_table();
+	let aa_seq = {
+		let mut aa_seq_tmp: Vec<String> = Vec::new();
+		for gidx in (0..(rna_sequence_spl.len())).step_by(3) {
+			let group: String = vec![rna_sequence_spl[gidx].clone(), rna_sequence_spl[gidx+1].clone(), rna_sequence_spl[gidx+2].clone()].join("");
+			aa_seq_tmp.push(aa_bases.get(&group).unwrap_or(&"-".to_string()).to_string());
+		};
+		aa_seq_tmp.join("")
+	};
+    let result: Vec<String> = match uppercase {
+        true => aa_seq.to_uppercase().split_inclusive("*").map(|s| String::from(s)).collect(),
+        false => aa_seq.split_inclusive("*").map(|s| String::from(s)).collect()
+    };
+    result.join("\n")
 }
 
 #[cfg(test)]
 mod tests {
-	use crate::{make_aa_hash_table, Aminoacid, dna2aa};
+	use crate::{make_aa_hash_table, Aminoacid, dna2aa, dna2aa_str};
 
 	#[test]
 	fn test_struct() {
@@ -134,21 +153,42 @@ mod tests {
 	#[test]
 	fn test_dna2aa_upper() {
 		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
-		let aa_sequence: Vec<String> = dna2aa(ff, Some(true));
+		let aa_sequence: Vec<String> = dna2aa(ff, true);
 		assert_eq!(aa_sequence, vec!["MRR*".to_string()])
 	}
 
 	#[test]
 	fn test_dna2aa_lower() {
 		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
-		let aa_sequence: Vec<String> = dna2aa(ff, Some(false));
+		let aa_sequence: Vec<String> = dna2aa(ff, false);
 		assert_eq!(aa_sequence, vec!["mrr*".to_string()])
     }
 
 	#[test]
 	fn test_dna2aa_multiple() {
 		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgaugaaugaggcgauga".to_string() };
-		let aa_sequence: Vec<String> = dna2aa(ff, Some(false));
+		let aa_sequence: Vec<String> = dna2aa(ff, false);
 		assert_eq!(aa_sequence, vec!["mrr*".to_string(), "mrr*".to_string()])
+	}
+
+	#[test]
+	fn test_dna2aa_upper_str() {
+		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
+		let aa_sequence: String = dna2aa_str(ff, true);
+		assert_eq!(aa_sequence, "MRR*".to_string())
+	}
+
+	#[test]
+	fn test_dna2aa_lower_str() {
+		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
+		let aa_sequence: String = dna2aa_str(ff, false);
+		assert_eq!(aa_sequence, "mrr*".to_string())
+    }
+
+	#[test]
+	fn test_dna2aa_multiple_str() {
+		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgaugaaugaggcgauga".to_string() };
+		let aa_sequence: String = dna2aa_str(ff, false);
+		assert_eq!(aa_sequence, "mrr*\nmrr*".to_string())
 	}
 }
