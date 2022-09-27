@@ -129,5 +129,7 @@ pub struct AAOptions {
     #[structopt(help = "File to read from")]
     pub file: PathBuf,
     #[structopt(help = "File to write to")]
-    pub ofile: Option<PathBuf>
+    pub ofile: Option<PathBuf>,
+    #[structopt(short, long, help = "Protein in lowercase (default: false)")]
+    pub lowercase: bool
 }

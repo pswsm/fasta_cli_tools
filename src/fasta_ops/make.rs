@@ -165,13 +165,19 @@ fn comp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, io::Error> {
     Ok(comp_fasta)
 }
 
-pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, io::Error> {
+pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>, uppercase: bool) -> Result<String, io::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: String = dna2aa::dna2aa(fasta.clone());
+    let aas: String = dna2aa::dna2aa_str(fasta.clone(), uppercase);
     if ofile.is_some() {
         let mut output_file = File::create(&ofile.unwrap())?;
         output_file.write(fasta.header.as_bytes())?;
         output_file.write(aas.as_bytes())?;
     }
+    Ok(aas)
+}
+
+pub fn to_aacids_vec(file: PathBuf, uppercase: bool) -> Result<Vec<String>, io::Error> {
+    let fasta: Fasta = crate::view::cat_f(&file)?;
+    let aas: Vec<String> = dna2aa::dna2aa(fasta.clone(), uppercase);
     Ok(aas)
 }

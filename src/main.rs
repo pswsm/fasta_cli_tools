@@ -23,7 +23,7 @@ fn main() {
             FastaOperation::Reverse(fst) => make::rev(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse strand")),
             FastaOperation::Complementary(fst) => make::comp(fst.file, fst.ofile).unwrap_or(String::from("Could not get complementary strand")),
             FastaOperation::Revcomp(fst) => make::revcomp(fst.file, fst.ofile).unwrap_or(String::from("Could not get reverse-complementary strand")),
-            FastaOperation::Amioacids(fst) => make::to_aacids(fst.file, fst.ofile).unwrap_or(String::from("Could not convert to aminoacids"))
+            FastaOperation::Amioacids(fst) => make::to_aacids(fst.file, fst.ofile, fst.lowercase).unwrap_or(String::from("Could not convert to aminoacids"))
         },
     };
 
