@@ -8,10 +8,10 @@ pub struct Aminoacid {
 }
 
 impl Aminoacid {
-	pub const fn from(aa_char: String, pos_codons: std::vec::Vec<String>) -> Aminoacid {
+	pub fn from(aa_char: &str, pos_codons: std::vec::Vec<&str>) -> Aminoacid {
 		Aminoacid {
-			aa: aa_char,
-			codons: pos_codons,
+			aa: aa_char.to_owned(),
+			codons: pos_codons.into_iter().map(|codon| codon.to_owned()).collect(),
 		}
 	}
 	pub const fn new() -> Aminoacid {
@@ -20,6 +20,9 @@ impl Aminoacid {
 			codons: Vec::new(),
 		}
 	}
+    pub fn push_codon(&mut self, codon: &str) {
+        self.codons.push(codon.to_owned());
+    }
 }
 
 impl Display for Aminoacid {
@@ -134,7 +137,7 @@ mod tests {
 
 	#[test]
 	fn test_struct() {
-		let methionine: Aminoacid = Aminoacid::from("m".to_string(), vec!["aug".to_string()]);
+		let methionine: Aminoacid = Aminoacid::from("m", vec!["aug"]);
 		assert_eq!(
 			methionine.aa == "m",
 			methionine.codons == vec!["aug".to_string()]
