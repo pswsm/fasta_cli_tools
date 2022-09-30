@@ -1,28 +1,19 @@
 use core::fmt;
 use std::{collections::HashMap, fmt::Display};
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Aminoacid {
 	aa: String,
 	codons: std::vec::Vec<String>,
 }
 
 impl Aminoacid {
-	pub fn from(aa_char: &str, pos_codons: std::vec::Vec<&str>) -> Aminoacid {
+	pub fn from(aa_char: &str, pos_codons: &[&str]) -> Aminoacid {
 		Aminoacid {
-			aa: aa_char.to_owned(),
-			codons: pos_codons.into_iter().map(|codon| codon.to_owned()).collect(),
+			aa: aa_char.to_string(),
+			codons: pos_codons.iter().map(|codon| codon.to_string()).collect(),
 		}
 	}
-	pub const fn new() -> Aminoacid {
-		Aminoacid {
-			aa: String::new(),
-			codons: Vec::new(),
-		}
-	}
-    pub fn push_codon(&mut self, codon: &str) {
-        self.codons.push(codon.to_owned());
-    }
 }
 
 impl Display for Aminoacid {
@@ -31,8 +22,51 @@ impl Display for Aminoacid {
 	}
 }
 
+#[derive(Default)]
+pub struct ProteinChain {
+    chain: std::vec::Vec<Aminoacid>
+}
+
+impl From<&[Aminoacid]> for ProteinChain {
+    fn from(some_aa: &[Aminoacid]) -> Self {
+        ProteinChain { chain: some_aa.to_vec() }
+    }
+}
+
+impl Display for ProteinChain {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.chain.iter().map(|aa| aa.aa.clone()).collect::<String>())
+    }
+}
+
+
+fn make_aa_table() -> std::vec::Vec<Aminoacid> {
+    let aa_holder: std::vec::Vec<Aminoacid> = vec![
+        Aminoacid::from("a", &["gcu", "gcc", "gca", "gcg"]),
+        Aminoacid::from("c", &["ugu", "ugc"]),
+        Aminoacid::from("d", &["gau", "gac"]),
+        Aminoacid::from("e", &["gaa", "gag"]),
+        Aminoacid::from("f", &["uuu", "uuc"]),
+        Aminoacid::from("g", &["ggu", "ggc", "gga", "ggg"]),
+        Aminoacid::from("h", &["cau", "cac"]),
+        Aminoacid::from("i", &["auu", "auc", "aua"]),
+        Aminoacid::from("k", &["aaa", "aag"]),
+        Aminoacid::from("l", &["uua", "uug", "cuu", "cuc", "cua", "cug"]),
+        Aminoacid::from("m", &["aug"]),
+        Aminoacid::from("n", &["ccu", "ccc", "cca", "ccg"]),
+        Aminoacid::from("p", &["caa", "cag"]),
+        Aminoacid::from("r", &["cgu", "cgc", "cga", "cgg", "aga", "agg"]),
+        Aminoacid::from("s", &["ucu", "ucc", "uca", "ucg", "agu", "agc"]),
+        Aminoacid::from("v", &["guu", "guc", "gua", "gug"]),
+        Aminoacid::from("w", &["ugg"]),
+        Aminoacid::from("y", &["uau", "uac"]),
+        Aminoacid::from("*", &["uaa", "uag", "uga"])
+    ];
+    aa_holder
+}
+
 fn make_aa_hash_table() -> HashMap<String, String> {
-	let aa_map = HashMap::from([
+	HashMap::from([
 		(String::from("gcu"), String::from("a")),
 		(String::from("gcc"), String::from("a")),
 		(String::from("gca"), String::from("a")),
@@ -91,12 +125,11 @@ fn make_aa_hash_table() -> HashMap<String, String> {
 		(String::from("uaa"), String::from("*")),
 		(String::from("uag"), String::from("*")),
 		(String::from("uga"), String::from("*")),
-	]);
-	return aa_map;
+	])
 }
 
 pub fn dna2aa(data: fasta::Fasta, uppercase: bool) -> Vec<String> {
-	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| String::from(c)).collect();
+	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| c.to_string()).collect();
 	let aa_bases: HashMap<String, String> = make_aa_hash_table();
 	let aa_seq = {
 		let mut aa_seq_tmp: Vec<String> = Vec::new();
@@ -107,14 +140,14 @@ pub fn dna2aa(data: fasta::Fasta, uppercase: bool) -> Vec<String> {
 		aa_seq_tmp.join("")
 	};
     let result: Vec<String> = match uppercase {
-        true => aa_seq.to_uppercase().split_inclusive("*").map(|s| String::from(s)).collect(),
-        false => aa_seq.split_inclusive("*").map(|s| String::from(s)).collect()
+        true => aa_seq.to_uppercase().split_inclusive('*').map(|s| s.to_string()).collect(),
+        false => aa_seq.split_inclusive('*').map(|s| s.to_string()).collect()
     };
     result
 }
 
 pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
-	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| String::from(c)).collect();
+	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| c.to_string()).collect();
 	let aa_bases: HashMap<String, String> = make_aa_hash_table();
 	let aa_seq = {
 		let mut aa_seq_tmp: Vec<String> = Vec::new();
@@ -125,8 +158,8 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
 		aa_seq_tmp.join("")
 	};
     let result: Vec<String> = match uppercase {
-        true => aa_seq.to_uppercase().split_inclusive("*").map(|s| String::from(s)).collect(),
-        false => aa_seq.split_inclusive("*").map(|s| String::from(s)).collect()
+        true => aa_seq.to_uppercase().split_inclusive('*').map(|s| s.to_string()).collect(),
+        false => aa_seq.split_inclusive('*').map(|s| s.to_string()).collect()
     };
     result.join("\n")
 }
@@ -137,7 +170,7 @@ mod tests {
 
 	#[test]
 	fn test_struct() {
-		let methionine: Aminoacid = Aminoacid::from("m", vec!["aug"]);
+		let methionine: Aminoacid = Aminoacid::from("m", &["aug"]);
 		assert_eq!(
 			methionine.aa == "m",
 			methionine.codons == vec!["aug".to_string()]
