@@ -41,15 +41,6 @@ pub mod aminoacid {
     mod tests {
         use crate::structs::aminoacid::Aminoacid;
         #[test]
-        fn from_manual() {
-            let methionine: Aminoacid = Aminoacid::from_manual("m", &["aug"]);
-            assert_eq!(
-                methionine.aa == "m",
-                methionine.codons == vec!["aug".to_string()]
-            )
-        }
-
-        #[test]
         fn from_vec_str() {
             let methionine: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
             assert_eq!(
