@@ -7,25 +7,25 @@ mod structs;
 
 fn make_aa_table() -> std::vec::Vec<Aminoacid> {
     let aa_holder: std::vec::Vec<Aminoacid> = vec![
-        Aminoacid::from_manual("a", &["gcu", "gcc", "gca", "gcg"]),
-        Aminoacid::from_manual("c", &["ugu", "ugc"]),
-        Aminoacid::from_manual("d", &["gau", "gac"]),
-        Aminoacid::from_manual("e", &["gaa", "gag"]),
-        Aminoacid::from_manual("f", &["uuu", "uuc"]),
-        Aminoacid::from_manual("g", &["ggu", "ggc", "gga", "ggg"]),
-        Aminoacid::from_manual("h", &["cau", "cac"]),
-        Aminoacid::from_manual("i", &["auu", "auc", "aua"]),
-        Aminoacid::from_manual("k", &["aaa", "aag"]),
-        Aminoacid::from_manual("l", &["uua", "uug", "cuu", "cuc", "cua", "cug"]),
-        Aminoacid::from_manual("m", &["aug"]),
-        Aminoacid::from_manual("n", &["ccu", "ccc", "cca", "ccg"]),
-        Aminoacid::from_manual("p", &["caa", "cag"]),
-        Aminoacid::from_manual("r", &["cgu", "cgc", "cga", "cgg", "aga", "agg"]),
-        Aminoacid::from_manual("s", &["ucu", "ucc", "uca", "ucg", "agu", "agc"]),
-        Aminoacid::from_manual("v", &["guu", "guc", "gua", "gug"]),
-        Aminoacid::from_manual("w", &["ugg"]),
-        Aminoacid::from_manual("y", &["uau", "uac"]),
-        Aminoacid::from_manual("*", &["uaa", "uag", "uga"])
+        Aminoacid::from(vec!["a", "gcu", "gcc", "gca", "gcg"]),
+        Aminoacid::from(vec!["c", "ugu", "ugc"]),
+        Aminoacid::from(vec!["d", "gau", "gac"]),
+        Aminoacid::from(vec!["e", "gaa", "gag"]),
+        Aminoacid::from(vec!["f", "uuu", "uuc"]),
+        Aminoacid::from(vec!["g", "ggu", "ggc", "gga", "ggg"]),
+        Aminoacid::from(vec!["h", "cau", "cac"]),
+        Aminoacid::from(vec!["i", "auu", "auc", "aua"]),
+        Aminoacid::from(vec!["k", "aaa", "aag"]),
+        Aminoacid::from(vec!["l", "uua", "uug", "cuu", "cuc", "cua", "cug"]),
+        Aminoacid::from(vec!["m", "aug"]),
+        Aminoacid::from(vec!["n", "ccu", "ccc", "cca", "ccg"]),
+        Aminoacid::from(vec!["p", "caa", "cag"]),
+        Aminoacid::from(vec!["r", "cgu", "cgc", "cga", "cgg", "aga", "agg"]),
+        Aminoacid::from(vec!["s", "ucu", "ucc", "uca", "ucg", "agu", "agc"]),
+        Aminoacid::from(vec!["v", "guu", "guc", "gua", "gug"]),
+        Aminoacid::from(vec!["w", "ugg"]),
+        Aminoacid::from(vec!["y", "uau", "uac"]),
+        Aminoacid::from(vec!["*", "uaa", "uag", "uga"])
     ];
     aa_holder
 }

@@ -2,8 +2,6 @@
 /// Module aminoacid contains the Aminoacid struct, the Aminoacids enum (unfinished) and its
 /// implementations. The trait From is a work in progress
 pub mod aminoacid {
-    use core::fmt;
-    use std::fmt::Display;
     use std::vec;
 
     #[allow(dead_code)]
@@ -17,39 +15,25 @@ pub mod aminoacid {
         pub codons: std::vec::Vec<String>,
     }
 
-    impl Aminoacid {
-        /// Manual constructor for aminoacid
-        /// This function will be deprecated and removed once the trait From<T> is implemented
-        /// correctly. At the moment use this to create Aminoacid structs.
-        ///
-        /// aa_char = aminoacid letter -> cehck if exists in enum [WIP]
-        /// pos_codons = codons translating to said protein
-        pub fn from_manual(aa_char: &str, pos_codons: &[&str]) -> Aminoacid {
-            Aminoacid {
-                aa: aa_char.to_string(),
-                codons: pos_codons.iter().map(|codon| codon.to_string()).collect(),
-            }
-        }
-    }
-
-    /// Technically, it should work same as creating a ProteinChain from an array, but it won't.
-    ///
-    /// From an array of Strings or &str (still undecided):
-    ///     -> array[0] = aminoacid letter -> check if exists in enum
-    ///     -> array[1..end] = codons translating to said protein
-    ///
-    /// THIS DOES NOT WORK, use public function from_manual() instead [see above]
-    impl From<&[String]> for Aminoacid {
-        fn from(data: &[String]) -> Self {
+    /// From a vector of &str:
+    ///     -> vec[0]: aminoacid letter -> check if exists in enum
+    ///     -> vec[1..end]: codons translating to said protein
+    impl From<std::vec::Vec<&str>> for Aminoacid {
+        fn from(data: std::vec::Vec<&str>) -> Self {
             let data: vec::Vec<String> = data.to_vec().iter().map(|e| e.to_string()).collect();
             let split_data: (&[String], &[String]) = data.split_at(1);
             Aminoacid { aa: split_data.0[0].to_string(), codons: split_data.1.to_vec() }
         }
     }
 
-    impl Display for Aminoacid {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}:\n{:#?}", self.aa, self.codons)
+    /// From a vector of String:
+    ///     -> vec[0]: aminoacid letter -> check if exists in enum
+    ///     -> vec[1..end]: codons translating to said protein
+    impl From<std::vec::Vec<String>> for Aminoacid {
+        fn from(data: std::vec::Vec<String>) -> Self {
+            let data: vec::Vec<String> = data.to_vec().iter().map(|e| e.to_string()).collect();
+            let split_data: (&[String], &[String]) = data.split_at(1);
+            Aminoacid { aa: split_data.0[0].to_string(), codons: split_data.1.to_vec() }
         }
     }
 
@@ -57,12 +41,30 @@ pub mod aminoacid {
     mod tests {
         use crate::structs::aminoacid::Aminoacid;
         #[test]
-        fn from_slice() {
+        fn from_manual() {
             let methionine: Aminoacid = Aminoacid::from_manual("m", &["aug"]);
             assert_eq!(
                 methionine.aa == "m",
                 methionine.codons == vec!["aug".to_string()]
             )
+        }
+
+        #[test]
+        fn from_vec_str() {
+            let methionine: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
+            assert_eq!(
+                methionine.aa == "m".to_owned(),
+                methionine.codons == vec!["aug".to_owned()]
+                )
+        }
+
+        #[test]
+        fn from_vec_string() {
+            let methionine: Aminoacid = Aminoacid::from(vec!["m".to_owned(), "aug".to_owned()]);
+            assert_eq!(
+                methionine.aa == "m".to_owned(),
+                methionine.codons == vec!["aug".to_owned()]
+                )
         }
     }
 }
@@ -71,6 +73,8 @@ pub mod proteins {
     use core::fmt;
     use std::fmt::Display;
     use crate::structs::aminoacid::Aminoacid;
+
+    /// ProteinChain has one field (chain), a Vector of Aminoacid.
     #[derive(Default)]
     pub struct ProteinChain {
         pub chain: std::vec::Vec<Aminoacid>
@@ -104,15 +108,15 @@ pub mod proteins {
     mod tests {
         use crate::structs::{proteins::ProteinChain, aminoacid::Aminoacid};
         #[test]
-        fn from_slice() {
-            let aminoacids: &[Aminoacid] = &[Aminoacid::from_manual("m", &["aug"]), Aminoacid::from_manual("m", &["aug"]), Aminoacid::from_manual("m", &["aug"]), Aminoacid::from_manual("m", &["aug"])];
+        fn from_array() {
+            let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
             let proteins: ProteinChain = ProteinChain::from(aminoacids);
             assert_eq!(proteins.to_string(), "mmmm".to_string())
         }
 
         #[test]
         fn from_vector() {
-            let aminoacids: std::vec::Vec<Aminoacid> = vec![Aminoacid::from_manual("m", &["aug"]), Aminoacid::from_manual("m", &["aug"]), Aminoacid::from_manual("m", &["aug"]), Aminoacid::from_manual("m", &["aug"])];
+            let aminoacids: std::vec::Vec<Aminoacid> = vec![Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
             let proteins: ProteinChain = ProteinChain::from(aminoacids);
             assert_eq!(proteins.to_string(), "mmmm".to_string())
         }
