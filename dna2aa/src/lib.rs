@@ -1,31 +1,31 @@
 use std::collections::HashMap;
-use crate::structs::structs::{
-    Aminoacid,
-    ProteinChain
+use crate::structs::{
+    aminoacid::Aminoacid,
+    proteins::ProteinChain
 };
 mod structs;
 
 fn make_aa_table() -> std::vec::Vec<Aminoacid> {
     let aa_holder: std::vec::Vec<Aminoacid> = vec![
-        Aminoacid::from("a", &["gcu", "gcc", "gca", "gcg"]),
-        Aminoacid::from("c", &["ugu", "ugc"]),
-        Aminoacid::from("d", &["gau", "gac"]),
-        Aminoacid::from("e", &["gaa", "gag"]),
-        Aminoacid::from("f", &["uuu", "uuc"]),
-        Aminoacid::from("g", &["ggu", "ggc", "gga", "ggg"]),
-        Aminoacid::from("h", &["cau", "cac"]),
-        Aminoacid::from("i", &["auu", "auc", "aua"]),
-        Aminoacid::from("k", &["aaa", "aag"]),
-        Aminoacid::from("l", &["uua", "uug", "cuu", "cuc", "cua", "cug"]),
-        Aminoacid::from("m", &["aug"]),
-        Aminoacid::from("n", &["ccu", "ccc", "cca", "ccg"]),
-        Aminoacid::from("p", &["caa", "cag"]),
-        Aminoacid::from("r", &["cgu", "cgc", "cga", "cgg", "aga", "agg"]),
-        Aminoacid::from("s", &["ucu", "ucc", "uca", "ucg", "agu", "agc"]),
-        Aminoacid::from("v", &["guu", "guc", "gua", "gug"]),
-        Aminoacid::from("w", &["ugg"]),
-        Aminoacid::from("y", &["uau", "uac"]),
-        Aminoacid::from("*", &["uaa", "uag", "uga"])
+        Aminoacid::from_manual("a", &["gcu", "gcc", "gca", "gcg"]),
+        Aminoacid::from_manual("c", &["ugu", "ugc"]),
+        Aminoacid::from_manual("d", &["gau", "gac"]),
+        Aminoacid::from_manual("e", &["gaa", "gag"]),
+        Aminoacid::from_manual("f", &["uuu", "uuc"]),
+        Aminoacid::from_manual("g", &["ggu", "ggc", "gga", "ggg"]),
+        Aminoacid::from_manual("h", &["cau", "cac"]),
+        Aminoacid::from_manual("i", &["auu", "auc", "aua"]),
+        Aminoacid::from_manual("k", &["aaa", "aag"]),
+        Aminoacid::from_manual("l", &["uua", "uug", "cuu", "cuc", "cua", "cug"]),
+        Aminoacid::from_manual("m", &["aug"]),
+        Aminoacid::from_manual("n", &["ccu", "ccc", "cca", "ccg"]),
+        Aminoacid::from_manual("p", &["caa", "cag"]),
+        Aminoacid::from_manual("r", &["cgu", "cgc", "cga", "cgg", "aga", "agg"]),
+        Aminoacid::from_manual("s", &["ucu", "ucc", "uca", "ucg", "agu", "agc"]),
+        Aminoacid::from_manual("v", &["guu", "guc", "gua", "gug"]),
+        Aminoacid::from_manual("w", &["ugg"]),
+        Aminoacid::from_manual("y", &["uau", "uac"]),
+        Aminoacid::from_manual("*", &["uaa", "uag", "uga"])
     ];
     aa_holder
 }
@@ -131,16 +131,7 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
 
 #[cfg(test)]
 mod tests {
-	use crate::{make_aa_hash_table, Aminoacid, dna2aa, dna2aa_str};
-
-	#[test]
-	fn test_struct() {
-		let methionine: Aminoacid = Aminoacid::from("m", &["aug"]);
-		assert_eq!(
-			methionine.aa == "m",
-			methionine.codons == vec!["aug".to_string()]
-		)
-	}
+	use crate::{make_aa_hash_table, dna2aa, dna2aa_str, structs::{aminoacid::Aminoacid, proteins::ProteinChain}};
 
 	#[test]
 	fn test_mk_table() {
