@@ -1,3 +1,4 @@
+//! I've put it here because it didn't work as a module inside dna2aa
 //! This library contains the structs for Aminoacid and ProteinChain
 use std::vec;
 use core::fmt;
@@ -9,17 +10,24 @@ pub enum Aminoacids {
 }
 
 /// Struct representing a protein or aminoacid
-///     -> aa: Letter of the protein
-///     -> codons: Codons of RNA that can compile this protein
 #[derive(Default, Clone)]
 pub struct Aminoacid {
+    /// aa: Letter of the protein
     pub aa: String,
+
+    /// codons: Codons of RNA that can compile this protein
     pub codons: std::vec::Vec<String>,
 }
 
-/// From a vector of &str:
-///     -> vec[0]: aminoacid letter -> check if exists in enum
-///     -> vec[1..end]: codons translating to said protein
+/// Transforms a vector of string slices into an Aminoacid struct. The first slice from said vector
+/// will be the protein letter. The following elements will be it's codons.
+///
+/// For example:
+/// ```
+/// let aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
+///
+/// println!("{}: {}", aa.aa, aa.codons) // Will output "m: aug"
+/// ```
 impl From<std::vec::Vec<&str>> for Aminoacid {
     fn from(data: std::vec::Vec<&str>) -> Self {
         let data: vec::Vec<String> = data.to_vec().iter().map(|e| e.to_string()).collect();
@@ -28,9 +36,15 @@ impl From<std::vec::Vec<&str>> for Aminoacid {
     }
 }
 
-/// From a vector of String:
-///     -> vec[0]: aminoacid letter -> check if exists in enum
-///     -> vec[1..end]: codons translating to said protein
+/// Transforms a vector of strings into an Aminoacid struct. The element from said vector
+/// will be the protein letter. The following elements will be it's codons.
+///
+/// For example:
+/// ```
+/// let aa: Aminoacid = Aminoacid::from(vec!["m".to_string(), "aug".to_string()]);
+///
+/// println!("{}: {}", aa.aa, aa.codons); // Will output "m: aug"
+/// ```
 impl From<std::vec::Vec<String>> for Aminoacid {
     fn from(data: std::vec::Vec<String>) -> Self {
         let data: vec::Vec<String> = data.to_vec().iter().map(|e| e.to_string()).collect();
@@ -39,31 +53,44 @@ impl From<std::vec::Vec<String>> for Aminoacid {
     }
 }
 
-/// Struct representing a chain of proteins:
-///     -> chain: A Vector holding many Aminoacid structs
+/// Struct representing a chain of proteins
 #[derive(Default)]
 pub struct ProteinChain {
+    /// chain: A Vector holding many Aminoacid structs
     pub chain: std::vec::Vec<Aminoacid>
 }
 
-/// From array of Aminoacid structs create a new ProteinChain struct
-/// Since it comes from an array it's converted to a Vector (std::vec::Vec)
+/// From array of Aminoacid structs create a new ProteinChain struct.
+/// Transform the array to a Vector (std::vec::Vec)
+///
+/// For example:
+/// ```
+/// let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
+/// let proteins: ProteinChain = ProteinChain::from(aminoacids);
+///
+/// println!(proteins); // Will output "mmmm"
+/// ```
 impl From<&[Aminoacid]> for ProteinChain {
     fn from(some_aa: &[Aminoacid]) -> Self {
         ProteinChain { chain: some_aa.to_vec() }
     }
 }
 
-/// From a vector of Aminoacid structs create a new ProteinChain struct
-/// The vector from which chain is created is a different one from the previously used
+/// From a vector of Aminoacid structs create a new ProteinChain struct. The field "chain" becomes a copy of the passed vector
+///
+/// For example:
+/// ```
+/// let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
+/// let proteins: ProteinChain = ProteinChain::from(aminoacids);
+///
+/// println!(proteins); // Will output "mmmm"
+/// ```
 impl From<std::vec::Vec<Aminoacid>> for ProteinChain {
     fn from(some_aa: std::vec::Vec<Aminoacid>) -> Self {
         ProteinChain { chain: some_aa.to_vec() }
     }
 }
 
-/// The implementation of the Display trait for ProteinChain
-/// Writes a string made of each aminoacid letter [Aminoacid.aa]
 impl Display for ProteinChain {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.chain.iter().map(|aa| aa.aa.clone()).collect::<String>())
@@ -75,20 +102,20 @@ mod tests {
     use crate::ProteinChain;
     use crate::Aminoacid;
     #[test]
-    fn from_array() {
+    fn protein_from_array() {
         let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
         let proteins: ProteinChain = ProteinChain::from(aminoacids);
         assert_eq!(proteins.to_string(), "mmmm".to_string())
     }
 
     #[test]
-    fn from_vector() {
+    fn protein_from_vector() {
         let aminoacids: std::vec::Vec<Aminoacid> = vec![Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
         let proteins: ProteinChain = ProteinChain::from(aminoacids);
         assert_eq!(proteins.to_string(), "mmmm".to_string())
     }
     #[test]
-    fn from_vec_str() {
+    fn aa_from_vec_str() {
         let methionine: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
         assert_eq!(
             methionine.aa == "m".to_owned(),
@@ -97,7 +124,7 @@ mod tests {
     }
 
     #[test]
-    fn from_vec_string() {
+    fn aa_from_vec_string() {
         let methionine: Aminoacid = Aminoacid::from(vec!["m".to_owned(), "aug".to_owned()]);
         assert_eq!(
             methionine.aa == "m".to_owned(),
