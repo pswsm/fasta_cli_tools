@@ -1,10 +1,7 @@
 use std::collections::HashMap;
-use crate::structs::{
-    aminoacid::Aminoacid,
-    proteins::ProteinChain
-};
-mod structs;
+use structs::Aminoacid;
 
+#[allow(dead_code)]
 fn make_aa_table() -> std::vec::Vec<Aminoacid> {
     let aa_holder: std::vec::Vec<Aminoacid> = vec![
         Aminoacid::from(vec!["a", "gcu", "gcc", "gca", "gcg"]),
@@ -131,8 +128,7 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
 
 #[cfg(test)]
 mod tests {
-	use crate::{make_aa_hash_table, dna2aa, dna2aa_str, structs::{aminoacid::Aminoacid, proteins::ProteinChain}};
-
+	use crate::{make_aa_hash_table, dna2aa, dna2aa_str};
 	#[test]
 	fn test_mk_table() {
 		let table = make_aa_hash_table();
