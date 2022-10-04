@@ -1,6 +1,8 @@
+//! This libray is tasked with aminoacid and protein operations
 use std::collections::HashMap;
 use structs::Aminoacid;
 
+/// Creates a vector holding all possible aminoacids.
 #[allow(dead_code)]
 fn make_aa_table() -> std::vec::Vec<Aminoacid> {
     let aa_holder: std::vec::Vec<Aminoacid> = vec![
@@ -27,6 +29,28 @@ fn make_aa_table() -> std::vec::Vec<Aminoacid> {
     aa_holder
 }
 
+/// Returns the aminoacid protein letter (```prot```) is.
+pub fn aa_compare(prot: &str) -> Aminoacid {
+    let aa_table: std::vec::Vec<Aminoacid> = make_aa_table();
+    let mut i: usize = 0;
+    while prot != aa_table[i].aa {
+        i = i + 1;
+    };
+
+    aa_table[i].clone()
+}
+
+/// Returns the aminoacid the codon compiles to.
+pub fn codon_compare(codon: &str) -> Aminoacid {
+    let aa_table: std::vec::Vec<Aminoacid> = make_aa_table();
+    let matched_triplets: std::vec::Vec<Aminoacid> = aa_table.into_iter().filter(|aa|
+                                               aa.codons.iter().any(|c| c == codon)
+                                               ).collect();
+    matched_triplets[0].clone()
+}
+
+/// Creates a HashMap holding each codon and it's protein equivalent. Used for comparing and
+/// replacing RNA chains to protein chains.
 fn make_aa_hash_table() -> HashMap<String, String> {
 	HashMap::from([
 		(String::from("gcu"), String::from("a")),
@@ -90,6 +114,9 @@ fn make_aa_hash_table() -> HashMap<String, String> {
 	])
 }
 
+
+/// Translates a given fasta struct and returns a vector of strings, each string being a protein
+/// letter.
 pub fn dna2aa(data: fasta::Fasta, uppercase: bool) -> Vec<String> {
 	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| c.to_string()).collect();
 	let aa_bases: HashMap<String, String> = make_aa_hash_table();
@@ -108,6 +135,7 @@ pub fn dna2aa(data: fasta::Fasta, uppercase: bool) -> Vec<String> {
     result
 }
 
+/// Same as ```dna2aa``` but returns a String.
 pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
 	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| c.to_string()).collect();
 	let aa_bases: HashMap<String, String> = make_aa_hash_table();
@@ -128,7 +156,14 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
 
 #[cfg(test)]
 mod tests {
-	use crate::{make_aa_hash_table, dna2aa, dna2aa_str};
+	use crate::{
+        make_aa_hash_table,
+        dna2aa,
+        dna2aa_str,
+        aa_compare,
+        codon_compare
+    };
+    use structs::Aminoacid;
 	#[test]
 	fn test_mk_table() {
 		let table = make_aa_hash_table();
@@ -139,44 +174,57 @@ mod tests {
 	}
 
 	#[test]
-	fn test_dna2aa_upper() {
-		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
-		let aa_sequence: Vec<String> = dna2aa(ff, true);
-		assert_eq!(aa_sequence, vec!["MRR*".to_string()])
+	fn test_dna2aa() {
+        {
+            let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
+            let aa_sequence_upper: Vec<String> = dna2aa(ff, true);
+            assert_eq!(aa_sequence_upper, vec!["MRR*".to_string()])
+        }
+        {
+            let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
+            let aa_sequence_lower: Vec<String> = dna2aa(ff, false);
+            assert_eq!(aa_sequence_lower, vec!["mrr*".to_string()])
+        }
+        {
+            let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgaugaaugaggcgauga".to_string() };
+            let aa_sequence: Vec<String> = dna2aa(ff, false);
+            assert_eq!(aa_sequence, vec!["mrr*".to_string(), "mrr*".to_string()])
+        }
 	}
 
 	#[test]
-	fn test_dna2aa_lower() {
-		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
-		let aa_sequence: Vec<String> = dna2aa(ff, false);
-		assert_eq!(aa_sequence, vec!["mrr*".to_string()])
+	fn test_dna2aa_str() {
+        {
+            let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
+            let aa_sequence: String = dna2aa_str(ff, true);
+            assert_eq!(aa_sequence, "MRR*".to_string())
+        }
+        {
+            let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
+            let aa_sequence: String = dna2aa_str(ff, false);
+            assert_eq!(aa_sequence, "mrr*".to_string())
+        }
+        {
+            let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgaugaaugaggcgauga".to_string() };
+            let aa_sequence: String = dna2aa_str(ff, false);
+            assert_eq!(aa_sequence, "mrr*\nmrr*".to_string())
+        }
+	}
+    
+    #[test]
+    fn test_compare_aa() {
+        let matched_aa: Aminoacid = aa_compare("m");
+        let base_aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
+        assert_eq!(matched_aa.aa, base_aa.aa);
+        assert_eq!(matched_aa.codons, base_aa.codons);
     }
 
-	#[test]
-	fn test_dna2aa_multiple() {
-		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgaugaaugaggcgauga".to_string() };
-		let aa_sequence: Vec<String> = dna2aa(ff, false);
-		assert_eq!(aa_sequence, vec!["mrr*".to_string(), "mrr*".to_string()])
-	}
-
-	#[test]
-	fn test_dna2aa_upper_str() {
-		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
-		let aa_sequence: String = dna2aa_str(ff, true);
-		assert_eq!(aa_sequence, "MRR*".to_string())
-	}
-
-	#[test]
-	fn test_dna2aa_lower_str() {
-		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgauga".to_string() };
-		let aa_sequence: String = dna2aa_str(ff, false);
-		assert_eq!(aa_sequence, "mrr*".to_string())
+    #[test]
+    fn compare_codons() {
+        let matched_aa: Aminoacid = codon_compare("aug");
+        let expected_aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
+        assert_eq!(matched_aa.aa, expected_aa.aa);
+        assert_eq!(matched_aa.codons, expected_aa.codons);
     }
 
-	#[test]
-	fn test_dna2aa_multiple_str() {
-		let ff: fasta::Fasta = fasta::Fasta { header: "".to_string(), sequence: "augaggcgaugaaugaggcgauga".to_string() };
-		let aa_sequence: String = dna2aa_str(ff, false);
-		assert_eq!(aa_sequence, "mrr*\nmrr*".to_string())
-	}
 }
