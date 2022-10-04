@@ -10,6 +10,7 @@ use structopt::StructOpt;
 
 // ----------------
 
+/// Runs the program
 fn main() {
     let args = Args::from_args();
 

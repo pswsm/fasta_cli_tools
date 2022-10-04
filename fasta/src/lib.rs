@@ -1,15 +1,28 @@
+//! Fasta file representation and basic methods for it
 use std::vec::Vec;
+use core::fmt;
+use std::fmt::Display;
 
+/// DNA allowed bases
 pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
+/// RNA allowed bases
 pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
 
+/// `.fasta` file representation in Rust. It has a header, and a sequence.
 #[derive(Clone)]
 pub struct Fasta {
     pub header: String,
     pub sequence: String,
 }
 
+impl Display for Fasta {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "> {}\n{}", self.header, self.sequence)
+    }
+}
+
 impl Fasta {
+    /// Creates a new, empty Fasta.
     #[allow(dead_code)]
     pub const fn new() -> Fasta {
         Fasta {
@@ -17,7 +30,8 @@ impl Fasta {
             sequence: String::new(),
         }
     }
-
+    
+    /// Creates a new Fasta from a header, and a sequence.
     pub const fn from(headr: String, seqnc: String) -> Fasta {
         Fasta {
             header: headr,
@@ -25,10 +39,7 @@ impl Fasta {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        String::from(format!("{}\n{}", self.header, self.sequence))
-    }
-
+    /// Creates a new fasta with the complementary chain of `self`.
     pub fn complement(&self) -> Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
         let comp_vec: Vec<String> = {
@@ -64,6 +75,7 @@ impl Fasta {
         }
     }
 
+    /// Creates a new `Fasta` with the reverse chain of `self`.
     pub fn reverse(&self) -> Fasta {
         let rev_seq: String = self.sequence.chars().rev().collect();
         Fasta {

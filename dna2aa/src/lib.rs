@@ -1,4 +1,4 @@
-//! This libray is tasked with aminoacid and protein operations
+//! Aminoacid and protein operations
 use std::collections::HashMap;
 use structs::Aminoacid;
 

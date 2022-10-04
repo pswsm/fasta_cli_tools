@@ -1,3 +1,5 @@
+//! Fasta file reading using `Fasta` struct.
+
 use std::{
     collections::BTreeMap,
     fs::File,
@@ -8,6 +10,7 @@ use std::{
 
 use fasta::Fasta;
 
+/// Reads files contents and returns them, independently of type.
 macro_rules! read2str {
     ($path:ident) => {{
         let file: File = File::open($path)?;
@@ -18,6 +21,7 @@ macro_rules! read2str {
     }};
 }
 
+/// Fake `Fasta` parser. Returns the contents of the file
 pub fn cat(file: &Path) -> io::Result<String> {
     let contents = read2str!(file);
     let reader_lines = contents.lines();
@@ -38,6 +42,8 @@ pub fn cat(file: &Path) -> io::Result<String> {
     Ok(fasta_as_string)
 }
 
+
+/// Parses a file to `Fasta` struct, and returns it.
 pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
     let contents = read2str!(file);
     let reader_lines = contents.lines();
@@ -58,6 +64,7 @@ pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
     Ok(fasta)
 }
 
+/// Analizes the contents of a DNA or RNA sequence.
 pub fn analize(file: &Path) -> Result<String, io::Error> {
     let fasta: Fasta = match cat_f(&file) {
         Ok(seq) => seq,

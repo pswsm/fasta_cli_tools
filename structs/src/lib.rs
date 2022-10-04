@@ -1,4 +1,4 @@
-//! I've put it here because it didn't work as a module inside dna2aa
+//! I've put it here because it didn't work as a module inside dna2aa.
 //! This library contains the structs for Aminoacid and ProteinChain
 use std::vec;
 use core::fmt;

@@ -1,3 +1,5 @@
+//! Fasta editing utilities
+
 use crate::fasta_ops::view;
 
 use fasta::Fasta;
@@ -6,12 +8,9 @@ use std::io::prelude::Write;
 use std::path::PathBuf;
 use textwrap::fill;
 
-pub fn cutting(
-    input_file: PathBuf,
-    output_file: PathBuf,
-    start: usize,
-    end: usize,
-) -> std::io::Result<String> {
+/// Reads a file, parses it as `Fasta` and cuts the sequence from given indices. This function will
+/// write the resulting cut sequence to a given file.
+pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usize) -> std::io::Result<String> {
     let og_fasta: Fasta = match view::cat_f(&input_file) {
         Ok(contents) => contents,
         Err(e) => panic!("Could not read file!. Error {}", e),
@@ -53,12 +52,14 @@ pub fn cutting(
     Ok(result)
 }
 
+/// Formats a given `String` to standard fasta line length (60 Characters).
 pub fn format_str(sequence: String) -> std::result::Result<String, String> {
     let strip_seq: String = sequence.replace("\n", "");
     let result: String = fill(&strip_seq, 60);
     Ok(result)
 }
 
+/// Formats a .fasta file, represented with the `Fasta` struct.
 pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> std::io::Result<String> {
     let fasta: Fasta = match view::cat_f(&file) {
         Ok(contents) => contents,
