@@ -11,6 +11,8 @@ use std::{
     thread,
 };
 
+/// Generates a RNA or DNA chain approximately N ```bases``` long. The actual length is different
+/// because of how the parallellization is done.
 pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> std::io::Result<String> {
     // let atcg: Vec<String> = vec![String::from("a"), String::from("t"), String::from("c"), String::from("g")];
     let atcg: [&str; 4] = match is_rna {
