@@ -23,45 +23,26 @@ macro_rules! read2str {
 
 /// Fake `Fasta` parser. Returns the contents of the file
 pub fn cat(file: &Path) -> io::Result<String> {
-    let contents = read2str!(file);
-    let reader_lines = contents.lines();
-
-    let mut header: String = String::new();
-    let mut sequence: String = String::new();
-    for line in reader_lines {
-        if line.starts_with(">") {
-            header.push_str(line);
-        } else if !line.starts_with(">") {
-            sequence.push_str(line);
-        } else {
-            panic! {"Yes."};
-        };
-    }
-
-    let fasta_as_string: String = format!("{}\n{}", header, sequence);
-    Ok(fasta_as_string)
+    let contents: String = read2str!(file);
+    let reader_lines: std::str::Lines = contents.lines();
+    let header: String = reader_lines.into_iter().filter(|line| line.starts_with(">")).collect();
+    let sequence: String = reader_lines.into_iter().filter(|line| !(line.starts_with(">"))).collect();
+    let fasta: Fasta = Fasta::from(&[header, sequence]);
+    Ok(fasta.to_string())
 }
 
 
 /// Parses a file to `Fasta` struct, and returns it.
 pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
-    let contents = read2str!(file);
-    let reader_lines = contents.lines();
+    let contents: String = read2str!(file);
+    let reader_lines: std::str::Lines = contents.lines();
+    let header: String = reader_lines.into_iter().filter(|line| line.starts_with(">")).collect();
+    let sequence: String = reader_lines.into_iter().filter(|line| !(line.starts_with(">"))).collect();
 
-    let mut header: String = String::new();
-    let mut sequence: String = String::new();
-    for line in reader_lines {
-        if line.starts_with(">") {
-            header.push_str(line);
-        } else if !line.starts_with(">") {
-            sequence.push_str(line);
-        } else {
-            panic! {"This should not happen"};
-        };
-    }
+    let fasta: Fasta = Fasta::from(&[header, sequence]);
 
-    let fasta: Fasta = Fasta::from(header, sequence);
     Ok(fasta)
+
 }
 
 /// Analizes the contents of a DNA or RNA sequence.
@@ -72,20 +53,10 @@ pub fn analize(file: &Path) -> Result<String, io::Error> {
     };
     let tot_chars: usize = fasta.sequence.chars().count();
     let chars: Vec<char> = fasta.sequence.chars().collect();
-    let mut c_count: usize = 0;
-    let mut g_count: usize = 0;
-    let mut a_count: usize = 0;
-    let mut t_count: usize = 0;
-    for chr in chars {
-        match chr {
-            'a' => a_count = a_count + 1,
-            't' => t_count = t_count + 1,
-            'u' => t_count = t_count + 1,
-            'c' => c_count = c_count + 1,
-            'g' => g_count = g_count + 1,
-            _ => return Ok("Non-dna related character detected.".to_string()),
-        };
-    }
+    let c_count: usize = fasta.sequence.chars().filter(|c| c.to_owned() == 'c').count();
+    let g_count: usize = fasta.sequence.chars().filter(|c| c.to_owned() == 'g').count();
+    let a_count: usize = fasta.sequence.chars().filter(|c| c.to_owned() == 'a').count();
+    let t_count: usize = fasta.sequence.chars().filter(|c| (c.to_owned() == 't' || c.to_owned() == 'u') ).count();
     let gc_pct: f64 = ((g_count + c_count) as f64 * 100_f64) / tot_chars as f64;
     let at_pct: f64 = ((a_count + t_count) as f64 * 100_f64) / tot_chars as f64;
 
@@ -99,9 +70,6 @@ pub fn analize(file: &Path) -> Result<String, io::Error> {
         hm
     };
 
-    let result: String = data
-        .iter()
-        .map(|(k, v)| format!("{}:\t{}\n", k, v))
-        .collect();
+    let result: String = data.iter().map(|(k, v)| format!("{}:\t{}\n", k, v)).collect();
     Ok(result)
 }

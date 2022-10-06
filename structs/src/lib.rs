@@ -4,11 +4,6 @@ use std::vec;
 use core::fmt;
 use std::fmt::Display;
 
-#[allow(dead_code)]
-pub enum Aminoacids {
-    Met(Aminoacid)
-}
-
 /// Struct representing a protein or aminoacid
 #[derive(Default, Clone)]
 pub struct Aminoacid {

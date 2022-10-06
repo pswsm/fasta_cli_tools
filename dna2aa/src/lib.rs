@@ -1,5 +1,4 @@
 //! Aminoacid and protein operations
-use std::collections::HashMap;
 use structs::Aminoacid;
 
 /// Creates a vector holding all possible aminoacids.
@@ -135,5 +134,4 @@ mod tests {
         assert_eq!(matched_aa.aa, expected_aa.aa);
         assert_eq!(matched_aa.codons, expected_aa.codons);
     }
-
 }
