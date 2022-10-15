@@ -32,6 +32,18 @@ impl From<&[String; 2]> for Fasta {
     }
 }
 
+impl From<&(&str, &str)> for Fasta {
+    fn from(data: &(&str, &str)) -> Fasta {
+        Fasta { header: data.0.to_string(), sequence: data.1.to_string() }
+    }
+}
+
+impl From<&(String, String)> for Fasta {
+    fn from(data: &(String, String)) -> Fasta {
+        Fasta { header: data.0.clone(), sequence: data.1.clone() }
+    }
+}
+
 impl Fasta {
     /// Creates a new, empty Fasta.
     pub fn new() -> Fasta {
@@ -41,7 +53,7 @@ impl Fasta {
         }
     }
     
-    /// Creates a new fasta with the complementary chain of `self`.
+    /// Returns a new fasta with the complementary chain of `self`.
     pub fn complement(&self) -> Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
         let comp_vec: Vec<String> = match og_seq.contains(&'u') {
