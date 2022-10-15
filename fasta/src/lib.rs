@@ -20,7 +20,6 @@ impl Display for Fasta {
     }
 }
 
-
 impl From<&[&str; 2]> for Fasta {
     fn from(data: &[&str; 2]) -> Fasta {
         Fasta { header: data[0].to_string(), sequence: data[1].to_string() }
@@ -45,31 +44,21 @@ impl Fasta {
     /// Creates a new fasta with the complementary chain of `self`.
     pub fn complement(&self) -> Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
-        let comp_vec: Vec<String> = {
-            let mut cs: Vec<&str> = Vec::new();
-            let is_rna: bool = og_seq.contains(&'u');
-            if is_rna {
-                for b in og_seq.into_iter() {
-                    match b {
-                        'a' => cs.append(&mut vec!["u"]),
-                        'u' => cs.append(&mut vec!["a"]),
-                        'c' => cs.append(&mut vec!["g"]),
-                        'g' => cs.append(&mut vec!["c"]),
-                        _ => (),
-                    };
-                }
-            } else {
-                for b in og_seq.into_iter() {
-                    match b {
-                        'a' => cs.append(&mut vec!["t"]),
-                        't' => cs.append(&mut vec!["a"]),
-                        'c' => cs.append(&mut vec!["g"]),
-                        'g' => cs.append(&mut vec!["c"]),
-                        _ => (),
-                    };
-                }
-            }
-            cs.into_iter().map(|b| b.to_string()).collect()
+        let comp_vec: Vec<String> = match og_seq.contains(&'u') {
+            true => og_seq.iter().map(|b| match b {
+                    'a' => "u".to_string(),
+                    'u' => "a".to_string(),
+                    'c' => "g".to_string(),
+                    'g' => "c".to_string(),
+                    _ => "".to_string()
+            }).collect(),
+            false => og_seq.iter().map(|b| match b {
+                    'a' => "t".to_string(),
+                    't' => "a".to_string(),
+                    'c' => "g".to_string(),
+                    'g' => "c".to_string(),
+                    _ => "".to_string()
+                }).collect()
         };
         let comp_sequence: String = comp_vec.into_iter().map(|b| b).collect();
         Fasta {
