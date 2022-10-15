@@ -1,34 +1,48 @@
-use std::vec::Vec;
+//! Fasta file representation and basic methods for it
+use core::fmt;
+use std::fmt::Display;
 
+/// DNA allowed bases
 pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
+/// RNA allowed bases
 pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
 
-#[derive(Clone)]
+/// `.fasta` file representation in Rust. It has a header, and a sequence.
+#[derive(Default, Clone)]
 pub struct Fasta {
     pub header: String,
     pub sequence: String,
 }
 
+impl Display for Fasta {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "> {}\n{}", self.header, self.sequence)
+    }
+}
+
+
+impl From<&[&str; 2]> for Fasta {
+    fn from(data: &[&str; 2]) -> Fasta {
+        Fasta { header: data[0].to_string(), sequence: data[1].to_string() }
+    }
+}
+
+impl From<&[String; 2]> for Fasta {
+    fn from(data: &[String; 2]) -> Fasta {
+        Fasta { header: data[0].clone(), sequence: data[1].clone() }
+    }
+}
+
 impl Fasta {
-    #[allow(dead_code)]
-    pub const fn new() -> Fasta {
+    /// Creates a new, empty Fasta.
+    pub fn new() -> Fasta {
         Fasta {
             header: String::new(),
             sequence: String::new(),
         }
     }
-
-    pub const fn from(headr: String, seqnc: String) -> Fasta {
-        Fasta {
-            header: headr,
-            sequence: seqnc,
-        }
-    }
-
-    pub fn to_string(&self) -> String {
-        String::from(format!("{}\n{}", self.header, self.sequence))
-    }
-
+    
+    /// Creates a new fasta with the complementary chain of `self`.
     pub fn complement(&self) -> Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
         let comp_vec: Vec<String> = {
@@ -64,6 +78,7 @@ impl Fasta {
         }
     }
 
+    /// Creates a new `Fasta` with the reverse chain of `self`.
     pub fn reverse(&self) -> Fasta {
         let rev_seq: String = self.sequence.chars().rev().collect();
         Fasta {
@@ -78,37 +93,34 @@ mod tests {
     use crate::Fasta;
 
     #[test]
-    fn make_fasta() {
-        let fasta: Fasta = Fasta::from(String::from("> Test Header"), String::from("atcg"));
-        assert_eq!(
-            fasta.header == String::from("> Test Header"),
-            fasta.sequence == String::from("atcg")
-        )
+    fn make_fasta_array() {
+        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
+        assert_eq!(fasta.header == "> test header".to_owned(), fasta.sequence == "atcg");
     }
 
     #[test]
     fn make_reverse() {
-        let fasta: Fasta = Fasta::from(String::from("> Test Header"), String::from("atcg"));
+        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
         assert_eq!(
-            fasta.header == String::from("> Reverse of > Test Header"),
+            fasta.header == String::from("> Reverse of > test Header"),
             fasta.sequence == String::from("gcta")
         )
     }
 
     #[test]
     fn make_complement_dna() {
-        let fasta: Fasta = Fasta { header: String::from("> Test Header"), sequence: String::from("atcg") };
+        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
         assert_eq!(
-            fasta.header == String::from("> Complementary of > Test header"),
+            fasta.header == String::from("> Complementary of > test header"),
             fasta.sequence == String::from("tagc")
         )
     }
 
     #[test]
     fn make_complement_rna() {
-        let fasta: Fasta = Fasta { header: String::from("> Test Header"), sequence: String::from("aucg") };
+        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
         assert_eq!(
-            fasta.header == String::from("> Complementary of > Test header"),
+            fasta.header == String::from("> Complementary of > test header"),
             fasta.sequence == String::from("uagc")
         )
     }

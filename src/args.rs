@@ -1,5 +1,9 @@
+//! All argument definitions
+
 use std::path::PathBuf;
 use structopt::StructOpt;
+
+/// Base `structopt` for arguments.
 #[derive(StructOpt)]
 #[structopt(name = "fasta_cli_toolkit",
             about = "A CLI toolkit to manipulate fasta files",
@@ -11,6 +15,7 @@ pub struct Args {
 
 // ----------------
 
+/// Enumeration with all possible command options.
 #[derive(StructOpt)]
 pub enum Command {
     Print(CatOptions),
@@ -23,6 +28,7 @@ pub enum Command {
 
 // ----------------
 
+/// Available arguments for `CatOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "print file options",
             about = "Reads file, prints its content",
@@ -34,6 +40,7 @@ pub struct CatOptions {
 
 // ----------------
 
+/// Available arguments for `CutOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "cutting options",
             about = "Cuts nucleotides from..to range",
@@ -54,6 +61,7 @@ pub struct CutOptions {
 
 // ----------------
 
+/// Available options for `GenerateOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "generation options",
             about = "Generates a fasta file of n bases",
@@ -71,6 +79,7 @@ pub struct GenerateOptions {
 
 // ----------------
 
+/// Available options for `FormatOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "format otions",
             about = "Formats a fasta file",
@@ -89,6 +98,7 @@ pub struct FormatOptions {
 
 // ----------------
 
+/// Available options for `AnalysisOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "analysis options",
             about = "Analyzes a sequence",
@@ -110,6 +120,7 @@ pub enum FastaOperation {
 
 // ----------------
 
+/// Available options for `StrandOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "get strand from another strand",
             about = "Get a strand, be it the reverse, the completary or the reverse-complementary from a given fasta file",
@@ -121,6 +132,7 @@ pub struct StrandOptions {
     pub ofile: Option<PathBuf>
 }
 
+/// Available options for `AAOptions`.
 #[derive(StructOpt)]
 #[structopt(name = "transform rna to aa",
             about = "Transform a RNA sequence to an Amioacid one.",
