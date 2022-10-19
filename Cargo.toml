@@ -17,4 +17,4 @@ structs = { path = "structs" }
 
 [profile.release]
 lto = true
-panic = 'abort'
+strip = "symbols"
