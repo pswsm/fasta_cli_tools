@@ -1,6 +1,10 @@
+use crate::{
+    structs,
+    dna2aa
+};
 use anyhow::Result;
 use crate::fasta_ops::edit::format_str;
-use fasta::{Fasta, DNA_BASES, RNA_BASES};
+use crate::fasta::{Fasta, DNA_BASES, RNA_BASES};
 use rand::seq::SliceRandom;
 use std::{
     fs::File,
