@@ -11,9 +11,6 @@ anyhow = "1.0.65"
 rand = "0.8.5"
 textwrap = "0.15"
 num_cpus = "1.13.1"
-dna2aa = { path = "dna2aa" }
-fasta = { path = "fasta" }
-structs = { path = "structs" }
 
 [profile.release]
 lto = true
