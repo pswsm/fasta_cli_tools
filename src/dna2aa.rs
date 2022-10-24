@@ -1,5 +1,9 @@
 //! Aminoacid and protein operations
-use structs::Aminoacid;
+use crate::structs::{
+    ProteinChain,
+    Aminoacid
+};
+use crate::fasta;
 
 /// Creates a vector holding all possible aminoacids.
 #[allow(dead_code)]
@@ -44,17 +48,17 @@ pub fn codon_compare(codon: &str) -> Aminoacid {
 
 /// Translates a given fasta struct and returns a vector of strings, each string being a protein
 /// letter.
-pub fn dna2aa(data: fasta::Fasta) -> structs::ProteinChain {
+pub fn dna2aa(data: fasta::Fasta) -> ProteinChain {
 	let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| c.to_string()).collect();
 	let aa_seq = {
 		let mut aa_seq_tmp: Vec<Aminoacid> = Vec::new();
 		for gidx in (0..(rna_sequence_spl.len())).step_by(3) {
 			let group: String = vec![rna_sequence_spl[gidx].clone(), rna_sequence_spl[gidx+1].clone(), rna_sequence_spl[gidx+2].clone()].join("");
-			aa_seq_tmp.push(crate::codon_compare(&group));
+			aa_seq_tmp.push(codon_compare(&group));
 		};
         aa_seq_tmp
 	};
-    structs::ProteinChain::from(aa_seq)
+    ProteinChain::from(aa_seq)
 }
 
 /// Same as `dna2aa` but returns a String.
@@ -64,28 +68,29 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
 		let mut aa_seq_tmp: Vec<Aminoacid> = Vec::new();
 		for gidx in (0..(rna_sequence_spl.len())).step_by(3) {
 			let group: String = vec![rna_sequence_spl[gidx].clone(), rna_sequence_spl[gidx+1].clone(), rna_sequence_spl[gidx+2].clone()].join("");
-			aa_seq_tmp.push(crate::codon_compare(&group));
+			aa_seq_tmp.push(codon_compare(&group));
 		};
         aa_seq_tmp
 	};
     match uppercase {
-        true => return structs::ProteinChain::from(aa_seq).to_string().to_uppercase(),
-        false => return structs::ProteinChain::from(aa_seq).to_string()
+        true => return ProteinChain::from(aa_seq).to_string().to_uppercase(),
+        false => return ProteinChain::from(aa_seq).to_string()
     }
 }
 
 #[cfg(test)]
 mod tests {
-	use crate::{
+	use crate::dna2aa::{
         dna2aa,
         dna2aa_str,
         aa_compare,
         codon_compare
     };
-    use structs::{
+    use crate::structs::{
         Aminoacid,
         ProteinChain
     };
+    use crate::fasta;
 	#[test]
 	fn test_dna2aa() {
         {

@@ -8,7 +8,7 @@ use std::{
     path::Path,
 };
 
-use fasta::Fasta;
+use crate::fasta::Fasta;
 
 /// Reads files contents and returns them, independently of type.
 macro_rules! read2str {

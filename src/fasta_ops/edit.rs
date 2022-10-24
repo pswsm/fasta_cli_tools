@@ -1,5 +1,5 @@
 //! Fasta editing utilities
-
+use crate::fasta;
 use crate::fasta_ops::view;
 
 use fasta::Fasta;

@@ -1,4 +1,7 @@
 mod fasta_ops;
+mod fasta;
+mod structs;
+mod dna2aa;
 mod args;
 use fasta_ops::{edit, view, make};
 use args::{
