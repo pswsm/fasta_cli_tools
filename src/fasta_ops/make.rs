@@ -15,6 +15,7 @@ use std::{
     thread,
 };
 
+#[macro_export]
 macro_rules! write2file {
     ($file:ident; $($fields:ident),+) => {{
         let mut output_file = File::create(&$file)?;

@@ -111,6 +111,9 @@ pub struct AnalysisOptions {
 // ----------------
 
 #[derive(StructOpt)]
+#[structopt(name = "sequence related operations",
+            about = "Get reverse, completary, reverse-complementary or transform to amioacids",
+            rename_all = "kebab-case")]
 pub enum FastaOperation {
     Reverse(StrandOptions),
     Complementary(StrandOptions),
