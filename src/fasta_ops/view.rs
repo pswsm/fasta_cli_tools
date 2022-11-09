@@ -22,18 +22,29 @@ macro_rules! read2str {
 }
 
 /// A wrapper function around `cat_f()` that returns a string.
-pub fn cat(file: &Path) -> io::Result<String> {
-    Ok(cat_f(file).unwrap_or_else(|_| Fasta::new() ).to_string())
+pub fn cat(file: &Path) -> anyhow::Result<String, anyhow::Error> {
+    /* if let Ok(fasta) = cat_f(file) {
+        return Ok(fasta.to_string())
+    }
+    if let Err(fasta) = cat_f(file) {
+        return Err(fasta)
+    } else {
+
+    } */
+    Ok(cat_f(file).unwrap_or_else(|_| Fasta::from(&["Could not open file!", ""]) ).to_string())
 }
 
 
 /// Parses a file to `Fasta` struct, and returns it.
-pub fn cat_f(file: &Path) -> Result<Fasta, io::Error> {
+pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
     let contents: String = read2str!(file);
     let reader_lines: std::str::Lines = contents.lines();
     let reader_lines_copy: std::str::Lines = reader_lines.clone();
-    let header: String = reader_lines.into_iter().filter(|line| line.starts_with('>')).collect();
+    let header: String = reader_lines.into_iter().filter(|line| line.starts_with('>')).map(|line| line.trim_start_matches("> ").to_owned() ).collect();
     let sequence: String = reader_lines_copy.into_iter().filter(|line| !(line.starts_with('>'))).collect();
+    if sequence.is_empty() {
+        return Err(anyhow::anyhow!("Sequence is empty.").context("The file has an empty sequence"))
+    }
 
     let fasta: Fasta = Fasta::from(&[header, sequence]);
 
