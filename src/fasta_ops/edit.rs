@@ -20,14 +20,14 @@ pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usi
     let original_sequence: String = og_fasta.sequence;
     let original_header: String = og_fasta.header;
 
-    let sequence_copy: String = original_sequence.replace("\n", "");
+    let sequence_copy: String = original_sequence.replace('\n', "");
 
     let cut_sequence: String = match sequence_copy.get(start - 1..end) {
         Some(seq) => seq.to_string(),
         None => panic!("Out of range"),
     };
 
-    let new_sequence: String = format_str(cut_sequence).unwrap_or_else(|_| sequence_copy );
+    let new_sequence: String = format_str(cut_sequence).unwrap_or(sequence_copy);
     let new_header: String = format!(
         ">Original Header {{{}}}. Original file: {}. Range: {} to {}\n",
         original_header,
@@ -49,7 +49,7 @@ pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usi
 
 /// Formats a given `String` to standard fasta line length (60 Characters).
 pub fn format_str(sequence: String) -> std::result::Result<String, String> {
-    let strip_seq: String = sequence.replace("\n", "");
+    let strip_seq: String = sequence.replace('\n', "");
     let result: String = fill(&strip_seq, 60);
     Ok(result)
 }
@@ -61,7 +61,7 @@ pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> std::io::Resu
         Err(e) => panic!("Could not read file. Error {}", e),
     };
     let result: String = String::from("Format OK!");
-    let strip_seq: String = fasta.sequence.replace("\n", "");
+    let strip_seq: String = fasta.sequence.replace('\n', "");
     let seq: String = fill(&strip_seq, 60);
     let fmt_fasta: Fasta = Fasta::from(&[fasta.header, seq]);
     //let mut output_file = File::create(out_file)?;

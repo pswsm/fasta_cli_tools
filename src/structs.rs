@@ -94,8 +94,8 @@ impl Display for ProteinChain {
 
 #[cfg(test)]
 mod tests {
-    use crate::ProteinChain;
-    use crate::Aminoacid;
+    use crate::structs::ProteinChain;
+    use crate::structs::Aminoacid;
     #[test]
     fn protein_from_array() {
         let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];

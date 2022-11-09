@@ -6,7 +6,6 @@ use crate::structs::{
 use crate::fasta;
 
 /// Creates a vector holding all possible aminoacids.
-#[allow(dead_code)]
 fn make_aa_table() -> std::vec::Vec<Aminoacid> {
     let aa_holder: std::vec::Vec<Aminoacid> = vec![
         Aminoacid::from(vec!["a", "gcu", "gcc", "gca", "gcg"]),
@@ -73,8 +72,8 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
         aa_seq_tmp
 	};
     match uppercase {
-        true => return ProteinChain::from(aa_seq).to_string().to_uppercase(),
-        false => return ProteinChain::from(aa_seq).to_string()
+        true => ProteinChain::from(aa_seq).to_string().to_uppercase(),
+        false => ProteinChain::from(aa_seq).to_string()
     }
 }
 

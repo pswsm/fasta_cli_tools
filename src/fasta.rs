@@ -72,9 +72,9 @@ impl Fasta {
                     _ => "".to_string()
                 }).collect()
         };
-        let comp_sequence: String = comp_vec.into_iter().map(|b| b).collect();
+        let comp_sequence: String = comp_vec.into_iter().collect();
         Fasta {
-            header: format!(">Complementary of {}", self.header.clone()),
+            header: format!("Complementary of {}", self.header.clone()),
             sequence: comp_sequence,
         }
     }
@@ -83,7 +83,7 @@ impl Fasta {
     pub fn reverse(&self) -> Fasta {
         let rev_seq: String = self.sequence.chars().rev().collect();
         Fasta {
-            header: format!(">Reverse of {}", self.header.clone()),
+            header: format!("Reverse of {}", self.header.clone()),
             sequence: rev_seq,
         }
     }
@@ -91,37 +91,37 @@ impl Fasta {
 
 #[cfg(test)]
 mod tests {
-    use crate::Fasta;
+    use crate::fasta::Fasta;
 
     #[test]
     fn make_fasta_array() {
-        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
+        let fasta: Fasta = Fasta::from(&["test header", "atcg"]);
         assert_eq!(fasta.header == "> test header".to_owned(), fasta.sequence == "atcg");
     }
 
     #[test]
     fn make_reverse() {
-        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
+        let fasta: Fasta = Fasta::from(&["test header", "atcg"]);
         assert_eq!(
-            fasta.header == String::from("> Reverse of > test Header"),
+            fasta.header == String::from("Reverse of > test Header"),
             fasta.sequence == String::from("gcta")
         )
     }
 
     #[test]
     fn make_complement_dna() {
-        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
+        let fasta: Fasta = Fasta::from(&["test header", "atcg"]);
         assert_eq!(
-            fasta.header == String::from("> Complementary of > test header"),
+            fasta.header == String::from("Complementary of > test header"),
             fasta.sequence == String::from("tagc")
         )
     }
 
     #[test]
     fn make_complement_rna() {
-        let fasta: Fasta = Fasta::from(&["> test header", "atcg"]);
+        let fasta: Fasta = Fasta::from(&["test header", "atcg"]);
         assert_eq!(
-            fasta.header == String::from("> Complementary of > test header"),
+            fasta.header == String::from("Complementary of > test header"),
             fasta.sequence == String::from("uagc")
         )
     }
