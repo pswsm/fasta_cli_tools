@@ -22,25 +22,37 @@ impl Display for Fasta {
 
 impl From<&[&str; 2]> for Fasta {
     fn from(data: &[&str; 2]) -> Fasta {
-        Fasta { header: data[0].to_string(), sequence: data[1].to_string() }
+        Fasta {
+            header: data[0].to_string(),
+            sequence: data[1].to_string(),
+        }
     }
 }
 
 impl From<&[String; 2]> for Fasta {
     fn from(data: &[String; 2]) -> Fasta {
-        Fasta { header: data[0].clone(), sequence: data[1].clone() }
+        Fasta {
+            header: data[0].clone(),
+            sequence: data[1].clone(),
+        }
     }
 }
 
 impl From<&(&str, &str)> for Fasta {
     fn from(data: &(&str, &str)) -> Fasta {
-        Fasta { header: data.0.to_string(), sequence: data.1.to_string() }
+        Fasta {
+            header: data.0.to_string(),
+            sequence: data.1.to_string(),
+        }
     }
 }
 
 impl From<&(String, String)> for Fasta {
     fn from(data: &(String, String)) -> Fasta {
-        Fasta { header: data.0.clone(), sequence: data.1.clone() }
+        Fasta {
+            header: data.0.clone(),
+            sequence: data.1.clone(),
+        }
     }
 }
 
@@ -52,25 +64,31 @@ impl Fasta {
             sequence: String::new(),
         }
     }
-    
+
     /// Returns a new fasta with the complementary chain of `self`.
     pub fn complement(&self) -> Fasta {
         let og_seq: Vec<char> = self.sequence.chars().collect();
         let comp_vec: Vec<String> = match og_seq.contains(&'u') {
-            true => og_seq.iter().map(|b| match b {
+            true => og_seq
+                .iter()
+                .map(|b| match b {
                     'a' => "u".to_string(),
                     'u' => "a".to_string(),
                     'c' => "g".to_string(),
                     'g' => "c".to_string(),
-                    _ => "".to_string()
-            }).collect(),
-            false => og_seq.iter().map(|b| match b {
+                    _ => "".to_string(),
+                })
+                .collect(),
+            false => og_seq
+                .iter()
+                .map(|b| match b {
                     'a' => "t".to_string(),
                     't' => "a".to_string(),
                     'c' => "g".to_string(),
                     'g' => "c".to_string(),
-                    _ => "".to_string()
-                }).collect()
+                    _ => "".to_string(),
+                })
+                .collect(),
         };
         let comp_sequence: String = comp_vec.into_iter().collect();
         Fasta {
@@ -96,7 +114,10 @@ mod tests {
     #[test]
     fn make_fasta_array() {
         let fasta: Fasta = Fasta::from(&["test header", "atcg"]);
-        assert_eq!(fasta.header == "> test header".to_owned(), fasta.sequence == "atcg");
+        assert_eq!(
+            fasta.header == "> test header".to_owned(),
+            fasta.sequence == "atcg"
+        );
     }
 
     #[test]
