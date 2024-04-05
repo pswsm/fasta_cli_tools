@@ -1,54 +1,20 @@
 //! Aminoacid and protein operations
 use crate::fasta;
-use crate::structs::{Aminoacid, ProteinChain};
+use crate::structs::{Aminoacid, AminoacidValue, Protein};
+use crate::utils::AMINOACID_TABLE;
 
-/// Creates a vector holding all possible aminoacids.
-fn make_aa_table() -> std::vec::Vec<Aminoacid> {
-    let aa_holder: std::vec::Vec<Aminoacid> = vec![
-        Aminoacid::from(vec!["a", "gcu", "gcc", "gca", "gcg"]),
-        Aminoacid::from(vec!["c", "ugu", "ugc"]),
-        Aminoacid::from(vec!["d", "gau", "gac"]),
-        Aminoacid::from(vec!["e", "gaa", "gag"]),
-        Aminoacid::from(vec!["f", "uuu", "uuc"]),
-        Aminoacid::from(vec!["g", "ggu", "ggc", "gga", "ggg"]),
-        Aminoacid::from(vec!["h", "cau", "cac"]),
-        Aminoacid::from(vec!["i", "auu", "auc", "aua"]),
-        Aminoacid::from(vec!["k", "aaa", "aag"]),
-        Aminoacid::from(vec!["l", "uua", "uug", "cuu", "cuc", "cua", "cug"]),
-        Aminoacid::from(vec!["m", "aug"]),
-        Aminoacid::from(vec!["n", "ccu", "ccc", "cca", "ccg"]),
-        Aminoacid::from(vec!["p", "caa", "cag"]),
-        Aminoacid::from(vec!["r", "cgu", "cgc", "cga", "cgg", "aga", "agg"]),
-        Aminoacid::from(vec!["s", "ucu", "ucc", "uca", "ucg", "agu", "agc"]),
-        Aminoacid::from(vec!["v", "guu", "guc", "gua", "gug"]),
-        Aminoacid::from(vec!["w", "ugg"]),
-        Aminoacid::from(vec!["y", "uau", "uac"]),
-        Aminoacid::from(vec!["*", "uaa", "uag", "uga"]),
-    ];
-    aa_holder
-}
-
-/// Returns the `Aminoacid` prot is from.
-pub fn aa_compare(prot: &str) -> Aminoacid {
-    let aa_table: std::vec::Vec<Aminoacid> = make_aa_table();
-    let matched_prot: std::vec::Vec<Aminoacid> =
-        aa_table.into_iter().filter(|aa| aa.aa == prot).collect();
+/// Fetches the selected aminoacid object from the aminoacid table
+pub fn fetch_aminoacid(aminoacid_to_fetch: AminoacidValue) -> Aminoacid {
+    let aa_table: std::vec::Vec<Aminoacid> = AMINOACID_TABLE;
+    let matched_prot: std::vec::Vec<Aminoacid> = aa_table
+        .into_iter()
+        .filter(|aminoacid| aminoacid.aminoacid == aminoacid_to_fetch)
+        .collect();
     matched_prot[0].clone()
 }
 
-/// Returns the aminoacid the codon compiles to.
-pub fn codon_compare(codon: &str) -> Aminoacid {
-    let aa_table: std::vec::Vec<Aminoacid> = make_aa_table();
-    let matched_triplets: std::vec::Vec<Aminoacid> = aa_table
-        .into_iter()
-        .filter(|aa| aa.codons.iter().any(|c| c == codon))
-        .collect();
-    matched_triplets[0].clone()
-}
-
-/// Translates a given fasta struct and returns a vector of strings, each string being a protein
-/// letter.
-pub fn dna2aa(data: fasta::Fasta) -> ProteinChain {
+/// Translates a given fasta struct and returns a protein
+pub fn dna2aa(data: fasta::Fasta) -> Protein {
     let rna_sequence_spl: Vec<String> = data.sequence.chars().map(|c| c.to_string()).collect();
     let aa_seq = {
         let mut aa_seq_tmp: Vec<Aminoacid> = Vec::new();
@@ -59,11 +25,11 @@ pub fn dna2aa(data: fasta::Fasta) -> ProteinChain {
                 rna_sequence_spl[gidx + 2].clone(),
             ]
             .join("");
-            aa_seq_tmp.push(codon_compare(&group));
+            aa_seq_tmp.push(Aminoacid::from(group));
         }
         aa_seq_tmp
     };
-    ProteinChain::from(aa_seq)
+    Protein::from(aa_seq)
 }
 
 /// Same as [dna2aa] but returns a String.
@@ -83,16 +49,16 @@ pub fn dna2aa_str(data: fasta::Fasta, uppercase: bool) -> String {
         aa_seq_tmp
     };
     match uppercase {
-        true => ProteinChain::from(aa_seq).to_string().to_uppercase(),
-        false => ProteinChain::from(aa_seq).to_string(),
+        true => Protein::from(aa_seq).to_string().to_uppercase(),
+        false => Protein::from(aa_seq).to_string(),
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::dna2aa::{aa_compare, codon_compare, dna2aa, dna2aa_str};
+    use crate::dna2aa::{codon_compare, dna2aa, dna2aa_str, fetch_aminoacid};
     use crate::fasta;
-    use crate::structs::{Aminoacid, ProteinChain};
+    use crate::structs::{Aminoacid, Protein};
     #[test]
     fn test_dna2aa() {
         {
@@ -100,7 +66,7 @@ mod tests {
                 header: "".to_string(),
                 sequence: "augaggcgauga".to_string(),
             };
-            let aa_sequence: ProteinChain = dna2aa(ff);
+            let aa_sequence: Protein = dna2aa(ff);
             assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
         }
         {
@@ -108,7 +74,7 @@ mod tests {
                 header: "".to_string(),
                 sequence: "augaggcgaugaaugaggcgauga".to_string(),
             };
-            let aa_sequence: ProteinChain = dna2aa(ff);
+            let aa_sequence: Protein = dna2aa(ff);
             assert_eq!(aa_sequence.to_string(), "mrr*mrr*".to_string())
         }
     }
@@ -143,17 +109,17 @@ mod tests {
 
     #[test]
     fn compare_aa() {
-        let matched_aa: Aminoacid = aa_compare("m");
-        let base_aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
-        assert_eq!(matched_aa.aa, base_aa.aa);
+        let matched_aa: Aminoacid = fetch_aminoacid('m');
+        let base_aa: Aminoacid = Aminoacid::from(('m', vec![['a', 'u', 'g']]));
+        assert_eq!(matched_aa.aminoacid, base_aa.aminoacid);
         assert_eq!(matched_aa.codons, base_aa.codons);
     }
 
     #[test]
     fn compare_codons() {
         let matched_aa: Aminoacid = codon_compare("aug");
-        let expected_aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
-        assert_eq!(matched_aa.aa, expected_aa.aa);
+        let base_aa: Aminoacid = Aminoacid::from(('m', vec![['a', 'u', 'g']]));
+        assert_eq!(matched_aa.aminoacid, expected_aa.aminoacid);
         assert_eq!(matched_aa.codons, expected_aa.codons);
     }
 }

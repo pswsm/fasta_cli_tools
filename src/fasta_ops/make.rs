@@ -58,16 +58,20 @@ fn select_rnd_str(string_list: &Vec<String>) -> String {
 
 /// Generates a random string chain given four different slices. Multithreaded if num_threads is bigger than one I guess
 fn generate_bases(
-    num_threads: usize,
+    threads: usize,
     num_bases: usize,
     bases: [&str; 4],
 ) -> thread::Result<Vec<String>> {
-    let bases_per_thread: usize = num_bases / num_threads;
+    let bases_per_thread: usize = num_bases / threads;
+    let bases_diff: usize = num_bases - bases_per_thread;
     let base_list: Vec<String> = bases.iter().map(|b| b.to_string()).collect();
     let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
     let mut children: Vec<thread::JoinHandle<()>> = Vec::new();
-    for _ in 0..num_threads {
-        let bases_per_thread_copy: usize = bases_per_thread;
+    for thread in 0..threads {
+        let mut bases_per_thread_copy: usize = bases_per_thread;
+        if thread >= threads {
+            bases_per_thread_copy = bases_per_thread_copy + bases_diff;
+        };
         let thread_tx: Sender<String> = tx.clone();
         let base_list_copy: Vec<String> = base_list.clone();
         let child = thread::spawn(move || {
@@ -83,7 +87,7 @@ fn generate_bases(
     }
 
     let mut sequences: Vec<String> = Vec::new();
-    for _ in 0..num_threads {
+    for _ in 0..threads {
         sequences.push(rx.recv().unwrap_or_else(|_| select_rnd_str(&base_list)));
         //println!("Message {} received", x);
     }
@@ -188,7 +192,7 @@ fn comp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, anyhow::Error>
 
 pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: structs::ProteinChain = dna2aa::dna2aa(fasta.clone());
+    let aas: structs::Protein = dna2aa::dna2aa(fasta.clone());
     if let Some(..) = ofile {
         let ofile: PathBuf = ofile.unwrap();
         let header: String = fasta.header.clone();
@@ -199,8 +203,8 @@ pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow
 }
 
 #[allow(dead_code)]
-pub fn to_protein_chain(file: PathBuf) -> Result<structs::ProteinChain, anyhow::Error> {
+pub fn to_protein_chain(file: PathBuf) -> Result<structs::Protein, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: structs::ProteinChain = dna2aa::dna2aa(fasta);
+    let aas: structs::Protein = dna2aa::dna2aa(fasta);
     Ok(aas)
 }
