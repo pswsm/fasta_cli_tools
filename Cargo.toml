@@ -11,7 +11,7 @@ anyhow = "1.0.65"
 rand = "0.8.5"
 textwrap = "0.15"
 num_cpus = "1.13.1"
-snafu = "0.8.2"
+lazy_static = "1.4.0"
 
 [profile.release]
 lto = true
