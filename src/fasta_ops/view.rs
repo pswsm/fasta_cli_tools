@@ -2,6 +2,7 @@
 
 use std::{
     collections::BTreeMap,
+    fmt::Write,
     fs::File,
     io::{prelude::Read, BufReader},
     path::Path,
@@ -88,7 +89,10 @@ pub fn analize(file: &Path) -> Result<String, anyhow::Error> {
 
     let result: String = data
         .into_iter()
-        .map(|(k, v)| format!("{}:\t{}\n", k, v))
-        .collect();
+        .fold(String::new(), |mut output, (key, value)| {
+            let _ = writeln!(output, "{}:\t{}", key, value);
+            output
+        });
+
     Ok(result)
 }

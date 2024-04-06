@@ -70,7 +70,7 @@ fn generate_bases(
     for thread in 0..threads {
         let mut bases_per_thread_copy: usize = bases_per_thread;
         if thread >= threads {
-            bases_per_thread_copy = bases_per_thread_copy + bases_diff;
+            bases_per_thread_copy += bases_diff;
         };
         let thread_tx: Sender<String> = tx.clone();
         let base_list_copy: Vec<String> = base_list.clone();
@@ -94,35 +94,25 @@ fn generate_bases(
     Ok(sequences)
 }
 
-/// Reverses a sequence from a given file, and saves it to another if output file is provided.
 pub fn rev(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let rev_fasta: Fasta = {
-        let rv: Fasta = fasta.reverse();
-        let nfseq: String = rv.sequence;
-        let fseq: String = format_str(nfseq).unwrap();
-        Fasta::from(&[rv.header, fseq])
-    };
-
-    if let Some(..) = ofile {
-        let mut output_file = File::create(ofile.unwrap())?;
-        output_file.write_all(fasta.header.as_bytes())?;
-        output_file.write_all(fasta.sequence.as_bytes())?;
+    let rev_fasta: Fasta = fasta.reverse();
+    if ofile.is_some() {
+        let ofile: PathBuf = ofile.unwrap();
+        let header: String = rev_fasta.header.clone();
+        let sequence: String = rev_fasta.sequence.clone();
+        write2file!(ofile; header, sequence);
     }
     Ok(rev_fasta.to_string())
 }
 
-/// Returns the reverse-complementary from a fasta file
 pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
     let revcomp_fasta: Fasta = {
         let rev: Fasta = fasta.reverse();
-        let rvcmp: Fasta = rev.complement();
-        let nfseq: String = rvcmp.sequence;
-        let fseq: String = format_str(nfseq).unwrap();
-        Fasta::from(&[rvcmp.header, fseq])
+        rev.complement()
     };
-    if let Some(..) = ofile {
+    if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
         let header: String = revcomp_fasta.header.clone();
         let sequence: String = revcomp_fasta.sequence.clone();
@@ -133,13 +123,8 @@ pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::
 
 pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let comp_fasta: Fasta = {
-        let cmp: Fasta = fasta.complement();
-        let nfseq: String = cmp.sequence;
-        let fseq: String = format_str(nfseq).unwrap();
-        Fasta::from(&[cmp.header, fseq])
-    };
-    if let Some(..) = ofile {
+    let comp_fasta: Fasta = fasta.complement();
+    if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
         let header: String = comp_fasta.header.clone();
         let sequence: String = comp_fasta.sequence.clone();
@@ -148,63 +133,14 @@ pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Err
     Ok(comp_fasta.to_string())
 }
 
-#[allow(dead_code)]
-fn rev_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let rev_fasta: Fasta = fasta.reverse();
-    if let Some(..) = ofile {
-        let ofile: PathBuf = ofile.unwrap();
-        let header: String = rev_fasta.header.clone();
-        let sequence: String = rev_fasta.sequence.clone();
-        write2file!(ofile; header, sequence);
-    }
-    Ok(rev_fasta)
-}
-
-#[allow(dead_code)]
-fn revcomp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let revcomp_fasta: Fasta = {
-        let rev: Fasta = fasta.reverse();
-        rev.complement()
-    };
-    if let Some(..) = ofile {
-        let ofile: PathBuf = ofile.unwrap();
-        let header: String = revcomp_fasta.header.clone();
-        let sequence: String = revcomp_fasta.sequence.clone();
-        write2file!(ofile; header, sequence);
-    }
-    Ok(revcomp_fasta)
-}
-
-#[allow(dead_code)]
-fn comp_f(file: PathBuf, ofile: Option<PathBuf>) -> Result<Fasta, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let comp_fasta: Fasta = fasta.complement();
-    if let Some(..) = ofile {
-        let ofile: PathBuf = ofile.unwrap();
-        let header: String = comp_fasta.header.clone();
-        let sequence: String = comp_fasta.sequence.clone();
-        write2file!(ofile; header, sequence);
-    }
-    Ok(comp_fasta)
-}
-
 pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: structs::Protein = dna2aa::dna2aa(fasta.clone());
-    if let Some(..) = ofile {
+    let aas: structs::Protein = dna2aa::fasta_to_protein(fasta.clone());
+    if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
         let header: String = fasta.header.clone();
         let sequence: String = fasta.sequence;
         write2file!(ofile; header, sequence);
     }
     Ok(aas.to_string())
-}
-
-#[allow(dead_code)]
-pub fn to_protein_chain(file: PathBuf) -> Result<structs::Protein, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: structs::Protein = dna2aa::dna2aa(fasta);
-    Ok(aas)
 }
