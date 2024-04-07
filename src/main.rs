@@ -2,6 +2,7 @@ mod args;
 mod dna2aa;
 mod fasta;
 mod fasta_ops;
+mod infrastructure;
 mod structs;
 use args::{Args, Command, FastaOperation};
 use clap::Parser;

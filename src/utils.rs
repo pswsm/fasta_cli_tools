@@ -4,6 +4,7 @@ use lazy_static::lazy_static;
 lazy_static! {
     /// Creates a vector holding all possible aminoacids.
     pub(crate) static ref AMINOACID_TABLE: Vec<Aminoacid> = vec![
+        Aminoacid::from(('-', Vec::new())),
         Aminoacid::from((
             'a',
             vec![

@@ -4,7 +4,7 @@ use crate::structs::{Aminoacid, Codon, Protein};
 
 /// Fasta to Protein translation
 pub fn fasta_to_protein(data: fasta::Fasta) -> Protein {
-    let rna_sequence_spl: Vec<char> = data.sequence.chars().collect();
+    let rna_sequence_spl: Vec<char> = data.sequence.get_chars().collect();
     let aa_seq = {
         let mut aa_seq_tmp: Vec<Aminoacid> = Vec::new();
         for gidx in (0..(rna_sequence_spl.len())).step_by(3) {
@@ -23,23 +23,17 @@ pub fn fasta_to_protein(data: fasta::Fasta) -> Protein {
 #[cfg(test)]
 mod tests {
     use crate::dna2aa::fasta_to_protein;
-    use crate::fasta;
+    use crate::fasta::Fasta;
     use crate::structs::{Aminoacid, Codon, Protein};
     #[test]
     fn test_dna2aa() {
         {
-            let ff: fasta::Fasta = fasta::Fasta {
-                header: "".to_string(),
-                sequence: "augaggcgauga".to_string(),
-            };
+            let ff = Fasta::from(("", "augaggcgauga"));
             let aa_sequence: Protein = fasta_to_protein(ff);
             assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
         }
         {
-            let ff: fasta::Fasta = fasta::Fasta {
-                header: "".to_string(),
-                sequence: "augaggcgaugaaugaggcgauga".to_string(),
-            };
+            let ff = Fasta::from(("", "augaggcgauga"));
             let aa_sequence: Protein = fasta_to_protein(ff);
             assert_eq!(aa_sequence.to_string(), "mrr*mrr*".to_string())
         }

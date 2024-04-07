@@ -3,7 +3,7 @@ use std::fmt::{self, Display};
 
 use crate::utils::AMINOACID_TABLE;
 
-/// Value object for a codon
+/// Basic codon value representation
 pub type CodonValue = [char; 3];
 
 /// Wrapper for CodonValue
@@ -19,6 +19,7 @@ impl Display for Codon {
 }
 
 impl Codon {
+    /// Create a new Codon from an array of 3 chars
     pub fn from_chars(value: [char; 3]) -> Self {
         let value_binding = value;
         if value_binding.clone().iter().count() != 3 {
@@ -30,7 +31,7 @@ impl Codon {
     }
 }
 
-/// Basic value the Aminoacid
+/// Basic aminoacid value representation
 type AminoacidValue = char;
 
 /// Representation a protein or aminoacid
@@ -57,20 +58,20 @@ impl Aminoacid {
             .into_iter()
             .filter(|aminoacid| aminoacid.codons.contains(&codon))
             .collect();
-        found_aminoacid[0].clone()
+        match found_aminoacid.len() {
+            0 => AMINOACID_TABLE[0].clone(),
+            _ => found_aminoacid[0].clone(),
+        }
     }
 }
 
-/// Transforms a tuple of string slices into an Aminoacid struct. The first slice from said vector
-/// will be the protein letter. The following elements will be it's codons.
-///
-/// This allows for the creation od custom aminoacids.
-///
-/// For example:
+/// Example:
 /// ```
-/// let aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
-///
-/// println!("{}: {}", aa.aa, aa.codons) // Will output "m: aug"
+/// Aminoacid::from(('m', vec![Codon::from_chars('a', 'u', 'g')]));
+/// ```
+/// or
+/// ```
+/// Aminoacid::from(('c', vec![Codon::from_chars(['u', 'g', 'u']), Codon::from_chars(['u', 'g', 'c'])])),
 /// ```
 impl From<(AminoacidValue, Vec<Codon>)> for Aminoacid {
     fn from((aminoacid, codons): (AminoacidValue, Vec<Codon>)) -> Self {
@@ -93,19 +94,17 @@ impl From<Codon> for Aminoacid {
 /// Struct representing a protein: a chain of aminoacids
 pub struct Protein {
     /// chain: A Vector holding Aminoacid structs
-    pub chain: std::vec::Vec<Aminoacid>,
+    pub chain: Vec<Aminoacid>,
 }
 
-/// From a vector of Aminoacid structs create a new ProteinChain struct. The field "chain" becomes a copy of the passed vector
+/// From a vector of [crate::Aminoacid] create a new Protein.
 ///
 /// For example:
 /// ```
-/// let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
-/// let proteins: ProteinChain = ProteinChain::from(aminoacids);
-///
-/// println!(proteins); // Will output "mmmm"
+/// let aminoacids: Vec<Aminoacid> = vec![Aminoacid::from(('m', vec![Codon::from_chars('a', 'u', 'g')])), Aminoacid::from('m', vec![Codon::from_chars('a', 'u', 'g')])];
+/// let proteins: Protein = Protein::from(aminoacids);
 /// ```
-impl From<std::vec::Vec<Aminoacid>> for Protein {
+impl From<Vec<Aminoacid>> for Protein {
     fn from(aminoacids: std::vec::Vec<Aminoacid>) -> Self {
         Protein { chain: aminoacids }
     }
@@ -127,7 +126,7 @@ mod tests {
     use crate::structs::Codon;
     use crate::structs::Protein;
     #[test]
-    fn protein_create() {
+    fn create_protein() {
         let aminoacids: std::vec::Vec<Aminoacid> = vec![
             Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
             Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
@@ -139,12 +138,18 @@ mod tests {
     }
 
     #[test]
-    fn aminoacid_create() {
+    fn create_aminoacid() {
         let methionine: Aminoacid =
             Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])]));
         assert_eq!(
             methionine.aminoacid == 'm',
             methionine.codons == vec![Codon::from_chars(['a', 'u', 'g'])]
         )
+    }
+
+    #[test]
+    fn create_codon() {
+        let codon: Codon = Codon::from_chars(['a', 'u', 'g']);
+        assert_eq!(codon.to_string(), "aug".to_string())
     }
 }
