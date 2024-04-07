@@ -1,26 +1,16 @@
+use crate::dna2aa;
 use crate::fasta::{Fasta, DNA_BASES, RNA_BASES};
 use crate::fasta_ops::edit::format_str;
-use crate::{dna2aa, structs};
+use crate::infrastructure::{write_chain_to_file, CommonWriteFormat};
+use crate::structs::Protein;
 use anyhow::Result;
 use rand::seq::SliceRandom;
 use std::{
-    fs::File,
-    io::Write,
     path::PathBuf,
     sync::mpsc,
     sync::mpsc::{Receiver, Sender},
     thread,
 };
-
-#[macro_export]
-macro_rules! write2file {
-    ($file:ident; $($fields:ident),+) => {{
-        let mut output_file = File::create(&$file)?;
-        $(
-            output_file.write_all($fields.as_bytes())?;
-         )+
-    }}
-}
 
 /// Generates a RNA or DNA chain of N `bases` and saves it to `file`.
 ///
@@ -31,7 +21,8 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> Result<String> {
         true => RNA_BASES,
         false => DNA_BASES,
     };
-    let header: String = format!(">randomly generated sequence of {} bases\n", bases);
+    let filename = file.display();
+    let header: String = format!("randomly generated sequence of {} bases", bases);
     let num_threads: usize = num_cpus::get();
     let sequence: String = match generate_bases(num_threads, bases, atcg) {
         Ok(seq) => seq.join("\n"),
@@ -39,10 +30,11 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> Result<String> {
     };
     let (fixed_length_sequence, _): (&str, _) = sequence.split_at(bases);
     let fmt_sequence: String = format_str(fixed_length_sequence.to_string()).unwrap();
-    write2file!(file; header, fmt_sequence);
+    let fsta = Fasta::from((header, fmt_sequence));
+    write_chain_to_file(&file, CommonWriteFormat::from(fsta))?;
     let result: String = format!(
         "Generated file \"{}\" with {} bases",
-        file.display(),
+        filename,
         fixed_length_sequence.to_string().len()
     );
 
@@ -95,15 +87,13 @@ fn generate_bases(
 }
 
 pub fn rev(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let rev_fasta: Fasta = fasta.reverse();
+    let original_fasta: Fasta = crate::view::cat_f(&file)?;
+    let rev_fasta: Fasta = original_fasta.reverse();
     if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
-        let header: String = rev_fasta.header.clone();
-        let sequence: String = rev_fasta.sequence.clone();
-        write2file!(ofile; header, sequence);
+        write_chain_to_file(&ofile, CommonWriteFormat::from(rev_fasta))?;
     }
-    Ok(rev_fasta.to_string())
+    Ok("".to_string())
 }
 
 pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
@@ -114,11 +104,9 @@ pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::
     };
     if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
-        let header: String = revcomp_fasta.header.clone();
-        let sequence: String = revcomp_fasta.sequence.clone();
-        write2file!(ofile; header, sequence);
+        write_chain_to_file(&ofile, CommonWriteFormat::from(revcomp_fasta))?;
     }
-    Ok(revcomp_fasta.to_string())
+    Ok("".to_string())
 }
 
 pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
@@ -126,21 +114,17 @@ pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Err
     let comp_fasta: Fasta = fasta.complement();
     if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
-        let header: String = comp_fasta.header.clone();
-        let sequence: String = comp_fasta.sequence.clone();
-        write2file!(ofile; header, sequence);
+        write_chain_to_file(&ofile, CommonWriteFormat::from(comp_fasta))?;
     }
-    Ok(comp_fasta.to_string())
+    Ok("".to_string())
 }
 
 pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: structs::Protein = dna2aa::fasta_to_protein(fasta.clone());
+    let aas: Protein = dna2aa::fasta_to_protein(fasta);
     if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
-        let header: String = fasta.header.clone();
-        let sequence: String = fasta.sequence;
-        write2file!(ofile; header, sequence);
+        write_chain_to_file(&ofile, CommonWriteFormat::from(aas))?;
     }
-    Ok(aas.to_string())
+    Ok("".to_string())
 }

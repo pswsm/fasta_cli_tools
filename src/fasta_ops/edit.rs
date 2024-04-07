@@ -1,24 +1,27 @@
 //! Fasta editing utilities
-use crate::fasta;
+use crate::fasta::{self, FastaHeader};
 use crate::fasta_ops::view;
-use crate::write2file;
+use crate::infrastructure::{write_chain_to_file, CommonWriteFormat};
 use anyhow::Result;
 use fasta::Fasta;
-use std::fs::File;
-use std::io::prelude::Write;
 use std::path::PathBuf;
 use textwrap::fill;
 
 /// Reads a file, parses it as `Fasta` and cuts the sequence from given indices. This function will
 /// write the resulting cut sequence to a given file.
-pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usize) -> Result<String> {
+pub fn cutting(
+    input_file: PathBuf,
+    output_file: PathBuf,
+    start: usize,
+    end: usize,
+) -> Result<String> {
     let og_fasta: Fasta = match view::cat_f(&input_file) {
         Ok(contents) => contents,
         Err(e) => panic!("Could not read file!. Error {}", e),
     };
 
-    let original_sequence: String = og_fasta.sequence;
-    let original_header: String = og_fasta.header;
+    let original_sequence: String = og_fasta.sequence.to_string();
+    let original_header: FastaHeader = og_fasta.header;
 
     let sequence_copy: String = original_sequence.replace('\n', "");
 
@@ -29,13 +32,14 @@ pub fn cutting(input_file: PathBuf, output_file: PathBuf, start: usize, end: usi
 
     let new_sequence: String = format_str(cut_sequence).unwrap_or(sequence_copy);
     let new_header: String = format!(
-        ">Original Header {{{}}}. Original file: {}. Range: {} to {}\n",
+        "Original Header {{{}}}. Original file: {}. Range: {} to {}",
         original_header,
         input_file.display(),
         start,
         end
     );
-    write2file!(output_file; new_header, new_sequence);
+    let new_fasta = Fasta::from((new_header, new_sequence));
+    write_chain_to_file(&output_file, CommonWriteFormat::from(new_fasta));
 
     let result: String = format!(
         "Cut from {} to {}. Read {}. Write {}",
@@ -61,16 +65,19 @@ pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> std::io::Resu
         Err(e) => panic!("Could not read file. Error {}", e),
     };
     let result: String = String::from("Format OK!");
-    let strip_seq: String = fasta.sequence.replace('\n', "");
+    let strip_seq: String = fasta.sequence.to_string().replace('\n', "");
     let seq: String = fill(&strip_seq, 60);
-    let fmt_fasta: Fasta = Fasta::from(&[fasta.header, seq]);
+    let fmt_fasta: Fasta = Fasta::from((fasta.header.to_string(), seq));
     //let mut output_file = File::create(out_file)?;
     if is_upper {
-        let final_fasta: String = Fasta::from(&[fmt_fasta.header, fmt_fasta.sequence.to_uppercase()]).to_string();
-        write2file!(out_file; final_fasta);
+        let final_fasta: Fasta = Fasta::from((
+            fmt_fasta.header.to_string(),
+            fmt_fasta.sequence.to_string().to_uppercase(),
+        ));
+        write_chain_to_file(&out_file, CommonWriteFormat::from(final_fasta));
     } else {
-        let final_fasta: String = fmt_fasta.to_string();
-        write2file!(out_file; final_fasta);
+        let final_fasta: Fasta = fmt_fasta;
+        write_chain_to_file(&out_file, CommonWriteFormat::from(final_fasta));
     };
     Ok(result)
 }

@@ -32,7 +32,7 @@ pub fn cat(file: &Path) -> anyhow::Result<String, anyhow::Error> {
 
     } */
     Ok(cat_f(file)
-        .unwrap_or_else(|_| Fasta::from(&["Could not open file!", ""]))
+        .unwrap_or_else(|_| Fasta::from(("Could not open file!", "")))
         .to_string())
 }
 
@@ -54,7 +54,7 @@ pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
         return Err(anyhow::anyhow!("Sequence is empty.").context("The file has an empty sequence"));
     }
 
-    let fasta: Fasta = Fasta::from(&[header, sequence]);
+    let fasta: Fasta = Fasta::from((header, sequence));
 
     Ok(fasta)
 }
@@ -65,13 +65,13 @@ pub fn analize(file: &Path) -> Result<String, anyhow::Error> {
         Ok(seq) => seq,
         Err(e) => return Err(anyhow::anyhow!("Can't read file. Error: {}", e)),
     };
-    let t_chars: usize = fasta.sequence.chars().count();
-    let c_count: usize = fasta.sequence.chars().filter(|&c| c == 'c').count();
-    let g_count: usize = fasta.sequence.chars().filter(|&c| c == 'g').count();
-    let a_count: usize = fasta.sequence.chars().filter(|&c| c == 'a').count();
+    let t_chars: usize = fasta.sequence.get_chars().count();
+    let c_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'c').count();
+    let g_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'g').count();
+    let a_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'a').count();
     let t_count: usize = fasta
         .sequence
-        .chars()
+        .get_chars()
         .filter(|&c| (c == 't' || c == 'u'))
         .count();
     let gc_pct: f64 = ((g_count + c_count) as f64 * 100_f64) / t_chars as f64;
