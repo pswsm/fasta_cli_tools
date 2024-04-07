@@ -126,7 +126,7 @@ mod tests {
     use crate::structs::Codon;
     use crate::structs::Protein;
     #[test]
-    fn create_protein() {
+    fn structs_protein() {
         let aminoacids: std::vec::Vec<Aminoacid> = vec![
             Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
             Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
@@ -138,7 +138,7 @@ mod tests {
     }
 
     #[test]
-    fn create_aminoacid() {
+    fn structs_aminoacid() {
         let methionine: Aminoacid =
             Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])]));
         assert_eq!(
@@ -148,7 +148,7 @@ mod tests {
     }
 
     #[test]
-    fn create_codon() {
+    fn structs_codon() {
         let codon: Codon = Codon::from_chars(['a', 'u', 'g']);
         assert_eq!(codon.to_string(), "aug".to_string())
     }
