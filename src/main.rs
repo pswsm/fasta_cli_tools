@@ -34,12 +34,20 @@ fn main() {
             view::analize(&args.file).unwrap_or_else(|_| String::from("Could not analyze"))
         }
         Command::Get(args) => match args {
-            FastaOperation::Reverse(fst) => make::rev(fst.file, fst.ofile)
-                .unwrap_or_else(|_| String::from("Could not get reverse strand")),
-            FastaOperation::Complementary(fst) => make::comp(fst.file, fst.ofile)
-                .unwrap_or_else(|_| String::from("Could not get complementary strand")),
-            FastaOperation::Revcomp(fst) => make::revcomp(fst.file, fst.ofile)
-                .unwrap_or_else(|_| String::from("Could not get reverse-complementary strand")),
+            FastaOperation::Reverse(fst) => {
+                make::operate_on_chain(fst.file, fst.ofile, make::FastaAllowedOperations::Reverse)
+                    .unwrap_or_else(|_| String::from("Could not get reverse strand"))
+            }
+            FastaOperation::Complementary(fst) => make::operate_on_chain(
+                fst.file,
+                fst.ofile,
+                make::FastaAllowedOperations::Complement,
+            )
+            .unwrap_or_else(|_| String::from("Could not get complementary strand")),
+            FastaOperation::Revcomp(fst) => {
+                make::operate_on_chain(fst.file, fst.ofile, make::FastaAllowedOperations::Both)
+                    .unwrap_or_else(|_| String::from("Could not get reverse-complementary strand"))
+            }
             FastaOperation::Amioacids(fst) => make::to_aacids(fst.file, fst.ofile)
                 .unwrap_or_else(|_| String::from("Could not convert to aminoacids")),
         },

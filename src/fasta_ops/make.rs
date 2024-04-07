@@ -2,10 +2,16 @@ use crate::dna2aa;
 use crate::fasta::{Fasta, DNA_BASES, RNA_BASES};
 use crate::infrastructure::{write_chain_to_file, CommonWriteFormat};
 use crate::structs::Protein;
+use crate::utils::select_rnd_str;
 use anyhow::Result;
-use rand::seq::SliceRandom;
 use rayon::prelude::*;
-use std::{path::PathBuf, thread};
+use std::path::PathBuf;
+
+pub enum FastaAllowedOperations {
+    Reverse,
+    Complement,
+    Both,
+}
 
 /// Generates a RNA or DNA chain of N `bases` and saves it to `file`.
 ///
@@ -30,13 +36,8 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> Result<String> {
     Ok(result)
 }
 
-/// Select a random `String` from a given `Vector`.
-fn select_rnd_str(string_list: &Vec<String>) -> String {
-    String::from(string_list.choose(&mut rand::thread_rng()).unwrap())
-}
-
 /// Generates a random string chain given four different slices. Multithreaded if num_threads is bigger than one I guess
-fn generate_bases(num_bases: usize, bases: [&str; 4]) -> thread::Result<Vec<String>> {
+fn generate_bases(num_bases: usize, bases: [&str; 4]) -> Result<Vec<String>> {
     let base_list: Vec<String> = bases.iter().map(|b| b.to_string()).collect();
     let ray_seq: Vec<_> = (0..=num_bases)
         .into_par_iter()
@@ -45,35 +46,20 @@ fn generate_bases(num_bases: usize, bases: [&str; 4]) -> thread::Result<Vec<Stri
     Ok(ray_seq)
 }
 
-pub fn rev(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
+pub fn operate_on_chain(
+    file: PathBuf,
+    ofile: Option<PathBuf>,
+    operation: FastaAllowedOperations,
+) -> Result<String> {
     let original_fasta: Fasta = crate::view::cat_f(&file)?;
-    let rev_fasta: Fasta = original_fasta.reverse();
-    if ofile.is_some() {
-        let ofile: PathBuf = ofile.unwrap();
-        write_chain_to_file(&ofile, CommonWriteFormat::from(rev_fasta))?;
-    }
-    Ok("".to_string())
-}
-
-pub fn revcomp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let revcomp_fasta: Fasta = {
-        let rev: Fasta = fasta.reverse();
-        rev.complement()
+    let operated_fasta = match operation {
+        FastaAllowedOperations::Reverse => original_fasta.reverse(),
+        FastaAllowedOperations::Complement => original_fasta.complement(),
+        FastaAllowedOperations::Both => original_fasta.reverse().complement(),
     };
     if ofile.is_some() {
         let ofile: PathBuf = ofile.unwrap();
-        write_chain_to_file(&ofile, CommonWriteFormat::from(revcomp_fasta))?;
-    }
-    Ok("".to_string())
-}
-
-pub fn comp(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let comp_fasta: Fasta = fasta.complement();
-    if ofile.is_some() {
-        let ofile: PathBuf = ofile.unwrap();
-        write_chain_to_file(&ofile, CommonWriteFormat::from(comp_fasta))?;
+        write_chain_to_file(&ofile, CommonWriteFormat::from(operated_fasta))?;
     }
     Ok("".to_string())
 }

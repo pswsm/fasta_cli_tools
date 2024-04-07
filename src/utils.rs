@@ -1,5 +1,6 @@
 use crate::structs::{Aminoacid, Codon};
 use lazy_static::lazy_static;
+use rand::seq::SliceRandom;
 
 lazy_static! {
     /// Creates a vector holding all possible aminoacids.
@@ -87,4 +88,9 @@ lazy_static! {
         Aminoacid::from(('y', vec![Codon::from_chars(['u', 'a', 'u']), Codon::from_chars(['u', 'a', 'c'])])),
         Aminoacid::from(('*', vec![Codon::from_chars(['u', 'a', 'a']), Codon::from_chars(['u', 'a', 'g']), Codon::from_chars(['u', 'g', 'a'])])),
     ];
+}
+
+/// Select a random `String` from a given `Vector`.
+pub(crate) fn select_rnd_str(string_list: &Vec<String>) -> String {
+    String::from(string_list.choose(&mut rand::thread_rng()).unwrap())
 }
