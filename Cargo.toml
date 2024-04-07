@@ -12,6 +12,7 @@ rand = "0.8.5"
 textwrap = "0.15"
 num_cpus = "1.13.1"
 lazy_static = "1.4.0"
+rayon = "1.10.0"
 
 [profile.release]
 lto = true
