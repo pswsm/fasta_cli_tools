@@ -2,8 +2,8 @@
 
 use std::{
     collections::BTreeMap,
+    fmt::Write,
     fs::File,
-    io,
     io::{prelude::Read, BufReader},
     path::Path,
 };
@@ -31,22 +31,30 @@ pub fn cat(file: &Path) -> anyhow::Result<String, anyhow::Error> {
     } else {
 
     } */
-    Ok(cat_f(file).unwrap_or_else(|_| Fasta::from(&["Could not open file!", ""]) ).to_string())
+    Ok(cat_f(file)
+        .unwrap_or_else(|_| Fasta::from(("Could not open file!", "")))
+        .to_string())
 }
-
 
 /// Parses a file to `Fasta` struct, and returns it.
 pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
     let contents: String = read2str!(file);
     let reader_lines: std::str::Lines = contents.lines();
     let reader_lines_copy: std::str::Lines = reader_lines.clone();
-    let header: String = reader_lines.into_iter().filter(|line| line.starts_with('>')).map(|line| line.trim_start_matches("> ").to_owned() ).collect();
-    let sequence: String = reader_lines_copy.into_iter().filter(|line| !(line.starts_with('>'))).collect();
+    let header: String = reader_lines
+        .into_iter()
+        .filter(|line| line.starts_with('>'))
+        .map(|line| line.trim_start_matches("> ").to_owned())
+        .collect();
+    let sequence: String = reader_lines_copy
+        .into_iter()
+        .filter(|line| !(line.starts_with('>')))
+        .collect();
     if sequence.is_empty() {
-        return Err(anyhow::anyhow!("Sequence is empty.").context("The file has an empty sequence"))
+        return Err(anyhow::anyhow!("Sequence is empty.").context("The file has an empty sequence"));
     }
 
-    let fasta: Fasta = Fasta::from(&[header, sequence]);
+    let fasta: Fasta = Fasta::from((header, sequence));
 
     Ok(fasta)
 }
@@ -55,13 +63,17 @@ pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
 pub fn analize(file: &Path) -> Result<String, anyhow::Error> {
     let fasta: Fasta = match cat_f(file) {
         Ok(seq) => seq,
-        Err(e) => return Err(anyhow::anyhow!("Can't read file. Error: {}", e))
+        Err(e) => return Err(anyhow::anyhow!("Can't read file. Error: {}", e)),
     };
-    let t_chars: usize = fasta.sequence.chars().count();
-    let c_count: usize = fasta.sequence.chars().filter(|&c| c == 'c').count();
-    let g_count: usize = fasta.sequence.chars().filter(|&c| c == 'g').count();
-    let a_count: usize = fasta.sequence.chars().filter(|&c| c == 'a').count();
-    let t_count: usize = fasta.sequence.chars().filter(|&c| (c == 't' || c == 'u') ).count();
+    let t_chars: usize = fasta.sequence.get_chars().count();
+    let c_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'c').count();
+    let g_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'g').count();
+    let a_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'a').count();
+    let t_count: usize = fasta
+        .sequence
+        .get_chars()
+        .filter(|&c| (c == 't' || c == 'u'))
+        .count();
     let gc_pct: f64 = ((g_count + c_count) as f64 * 100_f64) / t_chars as f64;
     let at_pct: f64 = ((a_count + t_count) as f64 * 100_f64) / t_chars as f64;
 
@@ -75,6 +87,12 @@ pub fn analize(file: &Path) -> Result<String, anyhow::Error> {
         hm
     };
 
-    let result: String = data.into_iter().map(|(k, v)| format!("{}:\t{}\n", k, v)).collect();
+    let result: String = data
+        .into_iter()
+        .fold(String::new(), |mut output, (key, value)| {
+            let _ = writeln!(output, "{}:\t{}", key, value);
+            output
+        });
+
     Ok(result)
 }

@@ -1,109 +1,121 @@
 //! This library contains the structs for Aminoacid and ProteinChain
-use core::fmt;
-use std::fmt::Display;
-use std::vec;
+use std::fmt::{self, Display};
 
-/// Struct representing a protein or aminoacid
+use crate::utils::AMINOACID_TABLE;
+
+/// Basic codon value representation
+pub type CodonValue = [char; 3];
+
+/// Wrapper for CodonValue
+#[derive(Debug, Clone, PartialEq)]
+pub struct Codon {
+    codon: CodonValue,
+}
+
+impl Display for Codon {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.codon.iter().collect::<String>())
+    }
+}
+
+impl Codon {
+    /// Create a new Codon from an array of 3 chars
+    pub fn from_chars(value: [char; 3]) -> Self {
+        let value_binding = value;
+        if value_binding.clone().iter().count() != 3 {
+            panic!("Not three (3) bases")
+        }
+        Codon {
+            codon: value_binding,
+        }
+    }
+}
+
+/// Basic aminoacid value representation
+type AminoacidValue = char;
+
+/// Representation a protein or aminoacid
 #[derive(Default, Clone)]
 pub struct Aminoacid {
-    /// aa: Letter of the protein
-    pub aa: String,
+    /// Letter of the protein
+    pub aminoacid: AminoacidValue,
 
-    /// codons: Codons of RNA that can compile this protein
-    pub codons: std::vec::Vec<String>,
+    /// Codons of RNA that can compile this protein
+    pub codons: Vec<Codon>,
 }
 
-/// Transforms a vector of string slices into an Aminoacid struct. The first slice from said vector
-/// will be the protein letter. The following elements will be it's codons.
-///
-/// For example:
-/// ```
-/// let aa: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
-///
-/// println!("{}: {}", aa.aa, aa.codons) // Will output "m: aug"
-/// ```
-impl From<std::vec::Vec<&str>> for Aminoacid {
-    fn from(data: std::vec::Vec<&str>) -> Self {
-        let data: vec::Vec<String> = data.to_vec().iter().map(|e| e.to_string()).collect();
-        let split_data: (&[String], &[String]) = data.split_at(1);
-        Aminoacid {
-            aa: split_data.0[0].to_string(),
-            codons: split_data.1.to_vec(),
+impl Display for Aminoacid {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.aminoacid)
+    }
+}
+
+impl Aminoacid {
+    /// Gets the desired aminoacid from a codon
+    pub fn get_aminoacd_from_codon(codon: Codon) -> Self {
+        let found_aminoacid: Vec<Aminoacid> = AMINOACID_TABLE
+            .clone()
+            .into_iter()
+            .filter(|aminoacid| aminoacid.codons.contains(&codon))
+            .collect();
+        match found_aminoacid.len() {
+            0 => AMINOACID_TABLE[0].clone(),
+            _ => found_aminoacid[0].clone(),
         }
     }
 }
 
-/// Transforms a vector of strings into an Aminoacid struct. The element from said vector
-/// will be the protein letter. The following elements will be it's codons.
-///
-/// For example:
+/// Example:
 /// ```
-/// let aa: Aminoacid = Aminoacid::from(vec!["m".to_string(), "aug".to_string()]);
-///
-/// println!("{}: {}", aa.aa, aa.codons); // Will output "m: aug"
+/// Aminoacid::from(('m', vec![Codon::from_chars('a', 'u', 'g')]));
 /// ```
-impl From<std::vec::Vec<String>> for Aminoacid {
-    fn from(data: std::vec::Vec<String>) -> Self {
-        let data: vec::Vec<String> = data.to_vec().iter().map(|e| e.to_string()).collect();
-        let split_data: (&[String], &[String]) = data.split_at(1);
-        Aminoacid {
-            aa: split_data.0[0].to_string(),
-            codons: split_data.1.to_vec(),
-        }
+/// or
+/// ```
+/// Aminoacid::from(('c', vec![Codon::from_chars(['u', 'g', 'u']), Codon::from_chars(['u', 'g', 'c'])])),
+/// ```
+impl From<(AminoacidValue, Vec<Codon>)> for Aminoacid {
+    fn from((aminoacid, codons): (AminoacidValue, Vec<Codon>)) -> Self {
+        Aminoacid { aminoacid, codons }
     }
 }
 
-/// Struct representing a chain of proteins
-#[derive(Default)]
-pub struct ProteinChain {
-    /// chain: A Vector holding many Aminoacid structs
-    pub chain: std::vec::Vec<Aminoacid>,
-}
-
-/// From array of Aminoacid structs create a new ProteinChain struct.
-/// Transform the array to a Vector (std::vec::Vec)
-///
-/// For example:
-/// ```
-/// let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
-/// let proteins: ProteinChain = ProteinChain::from(aminoacids);
-///
-/// println!(proteins); // Will output "mmmm"
-/// ```
-impl From<&[Aminoacid]> for ProteinChain {
-    fn from(some_aa: &[Aminoacid]) -> Self {
-        ProteinChain {
-            chain: some_aa.to_vec(),
-        }
+/// From a given codon, returns the corresponding aminoacid
+impl From<Codon> for Aminoacid {
+    fn from(value: Codon) -> Self {
+        AMINOACID_TABLE
+            .clone()
+            .into_iter()
+            .filter(|aminoacid| aminoacid.codons.contains(&value))
+            .collect::<Vec<Aminoacid>>()[0]
+            .clone()
     }
 }
 
-/// From a vector of Aminoacid structs create a new ProteinChain struct. The field "chain" becomes a copy of the passed vector
+/// Struct representing a protein: a chain of aminoacids
+pub struct Protein {
+    /// chain: A Vector holding Aminoacid structs
+    pub chain: Vec<Aminoacid>,
+}
+
+/// From a vector of [crate::Aminoacid] create a new Protein.
 ///
 /// For example:
 /// ```
-/// let aminoacids: &[Aminoacid] = &[Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"]), Aminoacid::from(vec!["m", "aug"])];
-/// let proteins: ProteinChain = ProteinChain::from(aminoacids);
-///
-/// println!(proteins); // Will output "mmmm"
+/// let aminoacids: Vec<Aminoacid> = vec![Aminoacid::from(('m', vec![Codon::from_chars('a', 'u', 'g')])), Aminoacid::from('m', vec![Codon::from_chars('a', 'u', 'g')])];
+/// let proteins: Protein = Protein::from(aminoacids);
 /// ```
-impl From<std::vec::Vec<Aminoacid>> for ProteinChain {
-    fn from(some_aa: std::vec::Vec<Aminoacid>) -> Self {
-        ProteinChain {
-            chain: some_aa.to_vec(),
-        }
+impl From<Vec<Aminoacid>> for Protein {
+    fn from(aminoacids: std::vec::Vec<Aminoacid>) -> Self {
+        Protein { chain: aminoacids }
     }
 }
 
-impl Display for ProteinChain {
+impl Display for Protein {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{}",
-            self.chain
-                .iter()
-                .map(|aa| aa.aa.clone())
-                .collect::<String>()
+            self.chain.iter().map(|aa| aa.aminoacid).collect::<String>()
         )
     }
 }
@@ -111,45 +123,33 @@ impl Display for ProteinChain {
 #[cfg(test)]
 mod tests {
     use crate::structs::Aminoacid;
-    use crate::structs::ProteinChain;
+    use crate::structs::Codon;
+    use crate::structs::Protein;
     #[test]
-    fn protein_from_array() {
-        let aminoacids: &[Aminoacid] = &[
-            Aminoacid::from(vec!["m", "aug"]),
-            Aminoacid::from(vec!["m", "aug"]),
-            Aminoacid::from(vec!["m", "aug"]),
-            Aminoacid::from(vec!["m", "aug"]),
-        ];
-        let proteins: ProteinChain = ProteinChain::from(aminoacids);
-        assert_eq!(proteins.to_string(), "mmmm".to_string())
-    }
-
-    #[test]
-    fn protein_from_vector() {
+    fn structs_protein() {
         let aminoacids: std::vec::Vec<Aminoacid> = vec![
-            Aminoacid::from(vec!["m", "aug"]),
-            Aminoacid::from(vec!["m", "aug"]),
-            Aminoacid::from(vec!["m", "aug"]),
-            Aminoacid::from(vec!["m", "aug"]),
+            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
+            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
+            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
+            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
         ];
-        let proteins: ProteinChain = ProteinChain::from(aminoacids);
+        let proteins: Protein = Protein::from(aminoacids);
         assert_eq!(proteins.to_string(), "mmmm".to_string())
     }
+
     #[test]
-    fn aa_from_vec_str() {
-        let methionine: Aminoacid = Aminoacid::from(vec!["m", "aug"]);
+    fn structs_aminoacid() {
+        let methionine: Aminoacid =
+            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])]));
         assert_eq!(
-            methionine.aa == *"m".to_owned(),
-            methionine.codons == vec!["aug".to_owned()]
+            methionine.aminoacid == 'm',
+            methionine.codons == vec![Codon::from_chars(['a', 'u', 'g'])]
         )
     }
 
     #[test]
-    fn aa_from_vec_string() {
-        let methionine: Aminoacid = Aminoacid::from(vec!["m".to_owned(), "aug".to_owned()]);
-        assert_eq!(
-            methionine.aa == *"m".to_owned(),
-            methionine.codons == vec!["aug".to_owned()]
-        )
+    fn structs_codon() {
+        let codon: Codon = Codon::from_chars(['a', 'u', 'g']);
+        assert_eq!(codon.to_string(), "aug".to_string())
     }
 }
