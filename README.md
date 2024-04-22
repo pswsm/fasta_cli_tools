@@ -8,7 +8,7 @@ I won't set any specific dates because I'm doing this on my free time.
 
 - ~DNA to Amino acid translation~ (It's actually RNA, but can be worked around easily now)
 - ~DNA transcrption and translation~
-- Amino Acid generation
+- ~Amino Acid generation~
 ---------------------------
 Down here harder things, to my assesment
 - Alignement between two sequences
