@@ -10,7 +10,7 @@ use std::path::PathBuf;
     about = "A CLI toolkit to manipulate fasta files",
     rename_all = "kebab-case"
 )]
-pub struct Args {
+pub struct Arguments {
     #[command(subcommand)]
     pub cmdline: Command,
 }

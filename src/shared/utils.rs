@@ -1,6 +1,7 @@
-use crate::structs::{Aminoacid, Codon};
 use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
+
+use crate::ctxs::{aminoacid::domain::aminoacid::Aminoacid, codon::domain::codon::Codon};
 
 lazy_static! {
     /// Creates a vector holding all possible aminoacids.

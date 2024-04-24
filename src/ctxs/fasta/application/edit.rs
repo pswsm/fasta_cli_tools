@@ -1,11 +1,11 @@
 //! Fasta editing utilities
-use crate::fasta;
-use crate::fasta_ops::view;
-use crate::infrastructure::{write_chain_to_file, CommonWriteFormat};
 use anyhow::Result;
-use fasta::Fasta;
 use std::path::PathBuf;
 use textwrap::fill;
+
+use crate::{ctxs::fasta::domain::fasta::Fasta, shared::infrastructure::CommonWriteFormat};
+
+use super::view;
 
 /// Reads a file, parses it as `Fasta` and cuts the sequence from given indices. This function will
 /// write the resulting cut sequence to a given file.
@@ -20,7 +20,7 @@ pub fn cutting(
         Err(e) => panic!("Could not read file!. Error {}", e),
     };
     let cut_fasta: Fasta = og_fasta.cut(start, end);
-    write_chain_to_file(&output_file, CommonWriteFormat::from(cut_fasta))?;
+    CommonWriteFormat::from(cut_fasta).save(&output_file)?;
 
     let result: String = format!(
         "Cut from {} to {}. Read {}. Write {}",
@@ -48,10 +48,10 @@ pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> Result<String
             fmt_fasta.header.to_string(),
             fmt_fasta.sequence.to_string().to_uppercase(),
         ));
-        write_chain_to_file(&out_file, CommonWriteFormat::from(final_fasta))?;
+        CommonWriteFormat::from(final_fasta).save(&out_file)?;
     } else {
         let final_fasta: Fasta = fmt_fasta;
-        write_chain_to_file(&out_file, CommonWriteFormat::from(final_fasta))?;
+        CommonWriteFormat::from(final_fasta).save(&out_file)?;
     };
     Ok(result)
 }

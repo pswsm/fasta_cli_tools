@@ -1,9 +1,11 @@
-//! Aminoacid and protein operations
-use crate::fasta;
-use crate::structs::{Aminoacid, Codon, Protein};
+// TODO: Move funtionality
+use super::{
+    aminoacid::domain::aminoacid::Aminoacid, fasta::domain::fasta::Fasta,
+    protein::domain::protein::Protein,
+};
 
 /// Fasta to Protein translation
-pub fn fasta_to_protein(data: fasta::Fasta) -> Protein {
+pub fn fasta_to_protein(data: Fasta) -> Protein {
     let rna_sequence_spl: Vec<char> = data.sequence.get_chars().collect();
     let aa_seq = {
         let mut aa_seq_tmp: Vec<Aminoacid> = Vec::new();
@@ -13,7 +15,7 @@ pub fn fasta_to_protein(data: fasta::Fasta) -> Protein {
                 rna_sequence_spl[gidx + 1],
                 rna_sequence_spl[gidx + 2],
             ];
-            aa_seq_tmp.push(Aminoacid::get_aminoacd_from_codon(Codon::from_chars(group)));
+            aa_seq_tmp.push(Aminoacid::from(group));
         }
         aa_seq_tmp
     };
@@ -22,9 +24,10 @@ pub fn fasta_to_protein(data: fasta::Fasta) -> Protein {
 
 #[cfg(test)]
 mod tests {
-    use crate::dna2aa::fasta_to_protein;
-    use crate::fasta::Fasta;
-    use crate::structs::Protein;
+    use crate::ctxs::{
+        dna2aa::fasta_to_protein, fasta::domain::fasta::Fasta, protein::domain::protein::Protein,
+    };
+
     #[test]
     fn test_dna2aa() {
         {

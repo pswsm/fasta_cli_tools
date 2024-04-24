@@ -159,7 +159,7 @@ impl Fasta {
 
 #[cfg(test)]
 mod tests {
-    use crate::fasta::{Fasta, FastaHeader, FastaSequence};
+    use crate::ctxs::fasta::domain::fasta::{Fasta, FastaHeader, FastaSequence};
 
     #[test]
     fn make_fasta_array() {
