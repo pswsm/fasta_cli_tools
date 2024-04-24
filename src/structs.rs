@@ -152,4 +152,13 @@ mod tests {
         let codon: Codon = Codon::from_chars(['a', 'u', 'g']);
         assert_eq!(codon.to_string(), "aug".to_string())
     }
+
+    #[test]
+    fn get_from_codon() {
+        let matched_aa: Aminoacid =
+            Aminoacid::get_aminoacd_from_codon(Codon::from_chars(['a', 'u', 'g']));
+        let base_aa: Aminoacid = Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])]));
+        assert_eq!(matched_aa.aminoacid, base_aa.aminoacid);
+        assert_eq!(matched_aa.codons, base_aa.codons);
+    }
 }

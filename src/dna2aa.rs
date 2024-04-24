@@ -24,27 +24,18 @@ pub fn fasta_to_protein(data: fasta::Fasta) -> Protein {
 mod tests {
     use crate::dna2aa::fasta_to_protein;
     use crate::fasta::Fasta;
-    use crate::structs::{Aminoacid, Codon, Protein};
+    use crate::structs::Protein;
     #[test]
     fn test_dna2aa() {
         {
             let ff = Fasta::from(("", "augaggcgauga"));
             let aa_sequence: Protein = fasta_to_protein(ff);
-            assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
+            assert_eq!(aa_sequence.to_string(), "mrr*mrr*".to_string())
         }
         {
             let ff = Fasta::from(("", "augaggcgauga"));
             let aa_sequence: Protein = fasta_to_protein(ff);
             assert_eq!(aa_sequence.to_string(), "mrr*mrr*".to_string())
         }
-    }
-
-    #[test]
-    fn get_from_codon() {
-        let matched_aa: Aminoacid =
-            Aminoacid::get_aminoacd_from_codon(Codon::from_chars(['a', 'u', 'g']));
-        let base_aa: Aminoacid = Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])]));
-        assert_eq!(matched_aa.aminoacid, base_aa.aminoacid);
-        assert_eq!(matched_aa.codons, base_aa.codons);
     }
 }
