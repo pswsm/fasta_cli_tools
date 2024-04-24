@@ -30,12 +30,12 @@ mod tests {
         {
             let ff = Fasta::from(("", "augaggcgauga"));
             let aa_sequence: Protein = fasta_to_protein(ff);
-            assert_eq!(aa_sequence.to_string(), "mrr*mrr*".to_string())
+            assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
         }
         {
             let ff = Fasta::from(("", "augaggcgauga"));
             let aa_sequence: Protein = fasta_to_protein(ff);
-            assert_eq!(aa_sequence.to_string(), "mrr*mrr*".to_string())
+            assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
         }
     }
 }
