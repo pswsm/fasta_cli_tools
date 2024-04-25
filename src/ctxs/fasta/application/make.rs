@@ -1,11 +1,14 @@
-use crate::dna2aa;
-use crate::fasta::{Fasta, DNA_BASES, RNA_BASES};
-use crate::infrastructure::{write_chain_to_file, CommonWriteFormat};
-use crate::structs::Protein;
-use crate::utils::select_rnd_str;
 use anyhow::Result;
 use rayon::prelude::*;
 use std::path::PathBuf;
+
+use crate::{
+    ctxs::{
+        fasta::domain::fasta::{Fasta, DNA_BASES, RNA_BASES},
+        protein::domain::protein::Protein,
+    },
+    shared::utils::select_rnd_str,
+};
 
 pub enum FastaAllowedOperations {
     Reverse,
@@ -27,7 +30,7 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> Result<String> {
         Err(e) => return Err(anyhow::anyhow!("Could not generate bases. Error: {:?}", e)),
     };
     let fsta = Fasta::from((header, sequence.clone()));
-    write_chain_to_file(&file, CommonWriteFormat::from(fsta))?;
+    fsta.save(&file)?;
     let result: String = format!(
         "Generated file \"{}\" with {} bases",
         file.display(),
@@ -57,19 +60,17 @@ pub fn operate_on_chain(
         FastaAllowedOperations::Complement => original_fasta.complement(),
         FastaAllowedOperations::Both => original_fasta.reverse().complement(),
     };
-    if ofile.is_some() {
-        let ofile: PathBuf = ofile.unwrap();
-        write_chain_to_file(&ofile, CommonWriteFormat::from(operated_fasta))?;
+    if let Some(file) = ofile {
+        operated_fasta.save(&file)?
     }
     Ok("".to_string())
 }
 
 pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: Protein = dna2aa::fasta_to_protein(fasta);
-    if ofile.is_some() {
-        let ofile: PathBuf = ofile.unwrap();
-        write_chain_to_file(&ofile, CommonWriteFormat::from(aas))?;
+    let aas: Protein = Protein::from(fasta);
+    if let Some(file) = ofile {
+        aas.save(&file)?
     }
     Ok("".to_string())
 }

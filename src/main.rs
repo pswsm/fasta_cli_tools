@@ -1,22 +1,18 @@
-mod args;
-mod dna2aa;
-mod fasta;
-mod fasta_ops;
-mod infrastructure;
-mod structs;
-use args::{Args, Command, FastaOperation};
+mod apps;
+mod ctxs;
+use apps::args::{Arguments, Command, FastaOperation};
 use clap::Parser;
-use fasta_ops::{edit, make, view};
-mod utils;
+use ctxs::fasta::application::{edit, make, view};
+mod shared;
 
 // ----------------
 
 /// Runs the program
 fn main() {
-    let args = Args::parse();
+    let args = Arguments::parse();
 
     let result = match args.cmdline {
-        Command::Cut(args) => edit::cutting(
+        Command::Cut(args) => edit::cut(
             args.input_file_name,
             args.output_file_name,
             args.from,

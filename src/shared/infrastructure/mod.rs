@@ -2,7 +2,7 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use anyhow::Result;
 
-use crate::{fasta::Fasta, structs::Protein};
+use crate::ctxs::{fasta::domain::fasta::Fasta, protein::domain::protein::Protein};
 
 pub struct CommonWriteFormat {
     header: Option<String>,
@@ -27,11 +27,13 @@ impl From<Protein> for CommonWriteFormat {
     }
 }
 
-pub(crate) fn write_chain_to_file(file_name: &PathBuf, chain: CommonWriteFormat) -> Result<()> {
-    let mut output_file: File = File::create(file_name)?;
-    if chain.header.is_some() {
-        output_file.write_all(chain.header.unwrap().as_bytes())?;
+impl CommonWriteFormat {
+    pub(crate) fn save(&self, file_name: &PathBuf) -> Result<()> {
+        let mut output_file: File = File::create(file_name)?;
+        if self.header.is_some() {
+            output_file.write_all(self.header.as_ref().unwrap().as_bytes())?;
+        }
+        output_file.write_all(self.chain.as_bytes())?;
+        Ok(())
     }
-    output_file.write_all(chain.chain.as_bytes())?;
-    Ok(())
 }
