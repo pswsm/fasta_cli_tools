@@ -44,7 +44,7 @@ impl Display for FastaSequence {
 impl From<String> for FastaSequence {
     fn from(value: String) -> Self {
         FastaSequence {
-            sequence: value.replace('\n', ""),
+            sequence: value.replace('\n', "").to_lowercase(),
         }
     }
 }
@@ -101,6 +101,12 @@ impl FastaSequence {
             sequence: self.sequence.get(start..end).unwrap_or("").to_string(),
         }
     }
+
+    fn to_uppercase(&self) -> Self {
+        FastaSequence {
+            sequence: self.sequence.to_uppercase(),
+        }
+    }
 }
 
 /// Fasta representation in Rust. It has a header, and a sequence.
@@ -153,6 +159,13 @@ impl Fasta {
         Fasta {
             header: FastaHeader::from(format!("{}, cut {} - {}", self.header, start, end)),
             sequence: self.sequence.cut(start, end),
+        }
+    }
+
+    pub fn uppercase(&self) -> Self {
+        Fasta {
+            header: self.header.to_owned(),
+            sequence: self.sequence.to_uppercase(),
         }
     }
 }

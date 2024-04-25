@@ -4,7 +4,6 @@ use std::path::PathBuf;
 
 use crate::{
     ctxs::{
-        dna2aa::fasta_to_protein,
         fasta::domain::fasta::{Fasta, DNA_BASES, RNA_BASES},
         protein::domain::protein::Protein,
     },
@@ -69,7 +68,7 @@ pub fn operate_on_chain(
 
 pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
     let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: Protein = fasta_to_protein(fasta);
+    let aas: Protein = Protein::from(fasta);
     if let Some(file) = ofile {
         aas.save(&file)?
     }

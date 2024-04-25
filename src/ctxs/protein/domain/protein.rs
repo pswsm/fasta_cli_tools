@@ -53,19 +53,33 @@ impl Display for Protein {
 #[cfg(test)]
 mod tests {
     use crate::ctxs::{
-        aminoacid::domain::aminoacid::Aminoacid, codon::domain::codon::Codon,
+        aminoacid::domain::aminoacid::Aminoacid, fasta::domain::fasta::Fasta,
         protein::domain::protein::Protein,
     };
 
     #[test]
-    fn structs_protein() {
+    fn protein_from_aminoacids() {
         let aminoacids: std::vec::Vec<Aminoacid> = vec![
-            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
-            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
-            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
-            Aminoacid::from(('m', vec![Codon::from_chars(['a', 'u', 'g'])])),
+            Aminoacid::from(('m', vec![['a', 'u', 'g']])),
+            Aminoacid::from(('m', vec![['a', 'u', 'g']])),
+            Aminoacid::from(('m', vec![['a', 'u', 'g']])),
+            Aminoacid::from(('m', vec![['a', 'u', 'g']])),
         ];
         let proteins: Protein = Protein::from(aminoacids);
         assert_eq!(proteins.to_string(), "mmmm".to_string())
+    }
+
+    #[test]
+    fn protein_from_fasta() {
+        {
+            let ff = Fasta::from(("", "augaggcgauga"));
+            let aa_sequence: Protein = Protein::from(ff);
+            assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
+        }
+        {
+            let ff = Fasta::from(("", "augaggcgauga"));
+            let aa_sequence: Protein = Protein::from(ff);
+            assert_eq!(aa_sequence.to_string(), "mrr*".to_string())
+        }
     }
 }

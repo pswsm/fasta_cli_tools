@@ -15,6 +15,18 @@ impl Display for Codon {
     }
 }
 
+impl From<[char; 3]> for Codon {
+    fn from(value: [char; 3]) -> Self {
+        let value_binding = value;
+        if value_binding.clone().iter().count() != 3 {
+            panic!("Not three (3) bases")
+        }
+        Codon {
+            codon: value_binding,
+        }
+    }
+}
+
 impl Codon {
     /// Create a new Codon from an array of 3 chars
     pub fn from_chars(value: [char; 3]) -> Self {
