@@ -131,7 +131,7 @@ pub struct AnalysisOptions {
 pub enum FastaOperation {
     Reverse(StrandOptions),
     Complementary(StrandOptions),
-    Revcomp(StrandOptions),
+    ReverseComplementary(StrandOptions),
     Amioacids(AAOptions),
 }
 

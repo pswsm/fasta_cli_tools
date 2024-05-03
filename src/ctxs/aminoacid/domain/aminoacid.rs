@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::{ctxs::codon::domain::codon::Codon, shared::utils::AMINOACID_TABLE};
+use crate::ctxs::{codon::domain::codon::Codon, shared::utils::AMINOACID_TABLE};
 
 /// Basic aminoacid value representation
 type AminoacidValue = char;

@@ -1,20 +1,12 @@
-use anyhow::Result;
-use rayon::prelude::*;
 use std::path::PathBuf;
 
-use crate::{
-    ctxs::{
-        fasta::domain::fasta::{Fasta, DNA_BASES, RNA_BASES},
-        protein::domain::protein::Protein,
-    },
+use anyhow::Result;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
+use crate::ctxs::{
+    fasta::domain::fasta::{Fasta, DNA_BASES, RNA_BASES},
     shared::utils::select_rnd_str,
 };
-
-pub enum FastaAllowedOperations {
-    Reverse,
-    Complement,
-    Both,
-}
 
 /// Generates a RNA or DNA chain of N `bases` and saves it to `file`.
 ///
@@ -47,30 +39,4 @@ fn generate_bases(num_bases: usize, bases: [&str; 4]) -> Result<Vec<String>> {
         .map(|_| select_rnd_str(&base_list))
         .collect();
     Ok(ray_seq)
-}
-
-pub fn operate_on_chain(
-    file: PathBuf,
-    ofile: Option<PathBuf>,
-    operation: FastaAllowedOperations,
-) -> Result<String> {
-    let original_fasta: Fasta = crate::view::cat_f(&file)?;
-    let operated_fasta = match operation {
-        FastaAllowedOperations::Reverse => original_fasta.reverse(),
-        FastaAllowedOperations::Complement => original_fasta.complement(),
-        FastaAllowedOperations::Both => original_fasta.reverse().complement(),
-    };
-    if let Some(file) = ofile {
-        operated_fasta.save(&file)?
-    }
-    Ok("".to_string())
-}
-
-pub fn to_aacids(file: PathBuf, ofile: Option<PathBuf>) -> Result<String, anyhow::Error> {
-    let fasta: Fasta = crate::view::cat_f(&file)?;
-    let aas: Protein = Protein::from(fasta);
-    if let Some(file) = ofile {
-        aas.save(&file)?
-    }
-    Ok("".to_string())
 }
