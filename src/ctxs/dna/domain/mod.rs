@@ -2,11 +2,11 @@ use anyhow::anyhow;
 
 use crate::ctxs::{
     fasta::domain::fasta::DNA_BASES,
-    shared::domain::{Chain, ChainObject},
+    shared::domain::{Sequence, SequenceObject},
 };
 
 pub struct Dna {
-    chain: ChainObject,
+    chain: SequenceObject,
 }
 
 impl TryFrom<String> for Dna {
@@ -23,9 +23,9 @@ impl TryFrom<String> for Dna {
     }
 }
 
-impl Chain for Dna {
-    fn chain_type(&self) -> crate::ctxs::shared::domain::ChainTypes {
-        crate::ctxs::shared::domain::ChainTypes::DNA
+impl Sequence for Dna {
+    fn sequence_type(&self) -> crate::ctxs::shared::domain::SequenceTypes {
+        crate::ctxs::shared::domain::SequenceTypes::DNA
     }
 }
 
@@ -37,7 +37,7 @@ impl Dna {
         }
     }
 
-    pub fn get_chain(&self) -> ChainObject {
+    pub fn get_chain(&self) -> SequenceObject {
         self.chain.clone()
     }
 }

@@ -1,11 +1,11 @@
-pub enum ChainTypes {
+pub enum SequenceTypes {
     DNA,
     RNA,
     PROTEIN,
 }
 
-pub type ChainObject = Vec<String>;
+pub type SequenceObject = Vec<String>;
 
-pub trait Chain {
-    fn chain_type(&self) -> ChainTypes;
+pub trait Sequence {
+    fn sequence_type(&self) -> SequenceTypes;
 }
