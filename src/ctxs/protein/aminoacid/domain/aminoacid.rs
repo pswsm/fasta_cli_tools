@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::ctxs::{codon::domain::codon::Codon, shared::utils::AMINOACID_TABLE};
+use crate::ctxs::{protein::codon::domain::codon::Codon, shared::utils::AMINOACID_TABLE};
 
 /// Basic aminoacid value representation
 type AminoacidValue = char;
@@ -57,7 +57,9 @@ impl From<[char; 3]> for Aminoacid {
 
 #[cfg(test)]
 mod tests {
-    use crate::ctxs::{aminoacid::domain::aminoacid::Aminoacid, codon::domain::codon::Codon};
+    use crate::ctxs::protein::{
+        aminoacid::domain::aminoacid::Aminoacid, codon::domain::codon::Codon,
+    };
 
     #[test]
     fn test_aminoacid() {

@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
 
-use crate::ctxs::aminoacid::domain::aminoacid::Aminoacid;
+use crate::ctxs::protein::aminoacid::domain::aminoacid::Aminoacid;
 
 lazy_static! {
     /// Creates a vector holding all possible aminoacids.

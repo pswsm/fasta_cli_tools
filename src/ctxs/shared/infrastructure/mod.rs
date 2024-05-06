@@ -2,7 +2,7 @@ use std::{fs::File, io::Write, path::PathBuf};
 
 use anyhow::Result;
 
-use crate::ctxs::{fasta::domain::fasta::Fasta, protein::domain::protein::Protein};
+use crate::ctxs::{fasta::domain::fasta::Fasta, protein::domain::Protein};
 
 pub struct CommonWriteFormat {
     header: Option<String>,

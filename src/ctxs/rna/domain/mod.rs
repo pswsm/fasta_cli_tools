@@ -1,29 +1,29 @@
 use anyhow::anyhow;
 
 use crate::ctxs::{
-    fasta::domain::fasta::C_DNA_BASES,
+    fasta::domain::fasta::C_RNA_BASES,
     shared::domain::{Sequence, SequenceObject},
 };
 
 #[derive(Debug, PartialEq, Eq)]
-struct Dna {
+struct Rna {
     chain: SequenceObject<char>,
 }
 
-impl TryFrom<String> for Dna {
+impl TryFrom<String> for Rna {
     type Error = anyhow::Error;
 
-    fn try_from(value: String) -> Result<Dna, anyhow::Error> {
+    fn try_from(value: String) -> Result<Rna, anyhow::Error> {
         Self::ensure_dna(&value)?;
-        Ok(Dna {
+        Ok(Rna {
             chain: value.chars().collect::<Vec<char>>(),
         })
     }
 }
 
-impl Sequence<char> for Dna {
+impl Sequence<char> for Rna {
     fn sequence_type(&self) -> crate::ctxs::shared::domain::SequenceType {
-        crate::ctxs::shared::domain::SequenceType::Dna
+        crate::ctxs::shared::domain::SequenceType::Rna
     }
 
     fn get_chain(&self) -> SequenceObject<char> {
@@ -31,14 +31,14 @@ impl Sequence<char> for Dna {
     }
 }
 
-impl Dna {
+impl Rna {
     fn ensure_dna(value: &str) -> Result<bool, anyhow::Error> {
         // TODO: better error ensure
         for base in value.chars() {
-            if !(C_DNA_BASES.contains(&base)) {
+            if !(C_RNA_BASES.contains(&base)) {
                 return Err(anyhow!(format!(
                     "Expected {:?}, found {}",
-                    C_DNA_BASES, base
+                    C_RNA_BASES, base
                 )));
             }
         }
@@ -48,21 +48,21 @@ impl Dna {
 
 #[cfg(test)]
 mod tests {
-    use crate::ctxs::dna::domain::Dna;
+    use crate::ctxs::rna::domain::Rna;
 
     #[test]
     fn try_from_string() {
-        let dna_one: Dna = Dna {
-            chain: vec!['a', 't', 'c', 'g'],
+        let dna_one: Rna = Rna {
+            chain: vec!['a', 'u', 'c', 'g'],
         };
-        let dna_two: Dna = Dna::try_from("atcg".to_string()).unwrap();
+        let dna_two: Rna = Rna::try_from("aucg".to_string()).unwrap();
         assert_eq!(dna_one, dna_two)
     }
 
     #[test]
     #[should_panic]
     fn try_from_invalid_string() {
-        match Dna::try_from("atcd".to_string()) {
+        match Rna::try_from("aucd".to_string()) {
             Err(_) => panic!(""),
             _ => unreachable!(),
         };

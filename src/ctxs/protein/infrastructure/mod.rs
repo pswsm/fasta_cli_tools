@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::ctxs::shared::infrastructure::CommonWriteFormat;
 
-use super::domain::protein::Protein;
+use super::domain::Protein;
 
 impl Protein {
     pub fn save(self, file: &PathBuf) -> Result<(), anyhow::Error> {

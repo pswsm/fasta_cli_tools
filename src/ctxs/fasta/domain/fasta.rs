@@ -8,6 +8,10 @@ use textwrap::fill;
 pub const DNA_BASES: [&str; 4] = ["a", "t", "c", "g"];
 /// RNA allowed bases
 pub const RNA_BASES: [&str; 4] = ["a", "u", "c", "g"];
+/// DNA allowed bases
+pub const C_DNA_BASES: [char; 4] = ['a', 't', 'c', 'g'];
+/// RNA allowed bases
+pub const C_RNA_BASES: [char; 4] = ['a', 'u', 'c', 'g'];
 
 /// Object for the header of a fasta file
 #[derive(Clone, PartialEq, Default)]

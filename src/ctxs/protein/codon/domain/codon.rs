@@ -42,7 +42,7 @@ impl Codon {
 
 #[cfg(test)]
 mod tests {
-    use crate::ctxs::codon::domain::codon::Codon;
+    use crate::ctxs::protein::codon::domain::codon::Codon;
 
     #[test]
     fn structs_codon() {

@@ -4,8 +4,9 @@ pub enum SequenceType {
     Protein,
 }
 
-pub type SequenceObject = Vec<String>;
+pub type SequenceObject<T> = Vec<T>;
 
-pub trait Sequence {
+pub trait Sequence<T> {
     fn sequence_type(&self) -> SequenceType;
+    fn get_chain(&self) -> SequenceObject<T>;
 }
