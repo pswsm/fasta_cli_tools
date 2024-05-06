@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic, clippy::complexity, clippy::perf)]
 mod apps;
 mod ctxs;
 use apps::args::{Arguments, Command, FastaOperation};
