@@ -5,7 +5,7 @@ use crate::ctxs::{
     shared::domain::{Sequence, SequenceObject},
 };
 
-pub struct Dna {
+struct Dna {
     chain: SequenceObject,
 }
 
@@ -24,8 +24,8 @@ impl TryFrom<String> for Dna {
 }
 
 impl Sequence for Dna {
-    fn sequence_type(&self) -> crate::ctxs::shared::domain::SequenceTypes {
-        crate::ctxs::shared::domain::SequenceTypes::DNA
+    fn sequence_type(&self) -> crate::ctxs::shared::domain::SequenceType {
+        crate::ctxs::shared::domain::SequenceType::Dna
     }
 }
 
