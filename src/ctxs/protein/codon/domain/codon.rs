@@ -1,9 +1,13 @@
 use std::fmt::{self, Display};
 
-/// Basic codon value representation
+use anyhow::ensure;
+
+use crate::ctxs::{fasta::domain::fasta::C_RNA_BASES, protein::codon::domain::error::CodonError};
+
+/// Codon Value Object
 pub type CodonValue = [char; 3];
 
-/// Wrapper for CodonValue
+/// Codon encapsulation
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Codon {
     codon: CodonValue,
@@ -15,28 +19,18 @@ impl Display for Codon {
     }
 }
 
-impl From<[char; 3]> for Codon {
-    fn from(value: [char; 3]) -> Self {
-        let value_binding = value;
-        if value_binding.clone().iter().count() != 3 {
-            panic!("Not three (3) bases")
-        }
-        Codon {
-            codon: value_binding,
-        }
-    }
-}
+impl TryFrom<[char; 3]> for Codon {
+    type Error = anyhow::Error;
 
-impl Codon {
-    /// Create a new Codon from an array of 3 chars
-    pub fn from_chars(value: [char; 3]) -> Self {
+    fn try_from(value: [char; 3]) -> Result<Self, Self::Error> {
         let value_binding = value;
-        if value_binding.clone().iter().count() != 3 {
-            panic!("Not three (3) bases")
-        }
-        Codon {
+        ensure!(
+            value_binding.into_iter().all(|c| C_RNA_BASES.contains(&c)),
+            CodonError::InvalidBases
+        );
+        Ok(Codon {
             codon: value_binding,
-        }
+        })
     }
 }
 
@@ -45,8 +39,17 @@ mod tests {
     use crate::ctxs::protein::codon::domain::codon::Codon;
 
     #[test]
-    fn structs_codon() {
-        let codon: Codon = Codon::from_chars(['a', 'u', 'g']);
+    fn should_create_a_codon() {
+        let codon: Codon = Codon::try_from(['a', 'u', 'g']).unwrap();
         assert_eq!(codon.to_string(), "aug".to_string())
+    }
+
+    #[test]
+    #[should_panic]
+    fn should_panic_on_invalid_base() {
+        let _c = match Codon::try_from(['a', 'u', 't']) {
+            Err(_) => panic!(),
+            Ok(x) => x,
+        };
     }
 }
