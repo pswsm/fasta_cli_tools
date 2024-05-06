@@ -12,7 +12,7 @@ pub struct Protein {
     pub chain: SequenceObject<Aminoacid>,
 }
 
-/// From a vector of [crate::Aminoacid] create a new Protein.
+/// From a vector of [`crate::Aminoacid`] create a new Protein.
 ///
 /// For example:
 /// ```
@@ -36,7 +36,7 @@ impl From<Fasta> for Protein {
                     rna_sequence_spl[gidx + 1],
                     rna_sequence_spl[gidx + 2],
                 ];
-                aa_seq_tmp.push(Aminoacid::from(group));
+                aa_seq_tmp.push(Aminoacid::try_from(group).unwrap());
             }
             aa_seq_tmp
         };
