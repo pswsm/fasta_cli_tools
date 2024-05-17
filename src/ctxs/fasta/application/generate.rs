@@ -5,7 +5,10 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::ctxs::{
     fasta::domain::fasta::{Fasta, DNA_BASES, RNA_BASES},
-    shared::utils::select_rnd_str,
+    shared::{
+        domain::SequenceValueObject,
+        utils::{select_rnd_char, select_rnd_str},
+    },
 };
 
 /// Generates a RNA or DNA chain of N `bases` and saves it to `file`.
@@ -32,7 +35,19 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> Result<String> {
 }
 
 /// Generates a random string chain given four different slices. Multithreaded if num_threads is bigger than one I guess
-fn generate_bases(num_bases: usize, bases: [&str; 4]) -> Result<Vec<String>> {
+pub(crate) fn c_generate_bases(
+    num_bases: usize,
+    bases: [char; 4],
+) -> Result<SequenceValueObject<char>> {
+    let ray_seq: Vec<_> = (0..=num_bases)
+        .into_par_iter()
+        .map(|_| select_rnd_char(bases))
+        .collect();
+    Ok(ray_seq)
+}
+
+/// Generates a random string chain given four different slices. Multithreaded if num_threads is bigger than one I guess
+pub(crate) fn generate_bases(num_bases: usize, bases: [&str; 4]) -> Result<Vec<String>> {
     let base_list: Vec<String> = bases.iter().map(|b| b.to_string()).collect();
     let ray_seq: Vec<_> = (0..=num_bases)
         .into_par_iter()

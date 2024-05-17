@@ -2,14 +2,14 @@ use std::fmt::{self, Display};
 
 use crate::ctxs::{
     fasta::domain::fasta::Fasta,
-    shared::domain::{Sequence, SequenceObject},
+    shared::domain::{Sequence, SequenceValueObject},
 };
 
 use super::aminoacid::domain::aminoacid::Aminoacid;
 
 /// Struct representing a protein: a chain of aminoacids
 pub struct Protein {
-    pub chain: SequenceObject<Aminoacid>,
+    pub chain: SequenceValueObject<Aminoacid>,
 }
 
 /// From a vector of [`crate::Aminoacid`] create a new Protein.
@@ -58,8 +58,12 @@ impl Sequence<Aminoacid> for Protein {
     fn sequence_type(&self) -> crate::ctxs::shared::domain::SequenceType {
         crate::ctxs::shared::domain::SequenceType::Protein
     }
-    fn get_chain(&self) -> crate::ctxs::shared::domain::SequenceObject<Aminoacid> {
+    fn get_chain(&self) -> crate::ctxs::shared::domain::SequenceValueObject<Aminoacid> {
         self.chain.clone()
+    }
+
+    fn generate() -> Self {
+        unimplemented!()
     }
 }
 

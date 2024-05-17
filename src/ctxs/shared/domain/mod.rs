@@ -4,9 +4,10 @@ pub enum SequenceType {
     Protein,
 }
 
-pub type SequenceObject<T> = Vec<T>;
+pub type SequenceValueObject<T> = Vec<T>;
 
 pub trait Sequence<T> {
     fn sequence_type(&self) -> SequenceType;
-    fn get_chain(&self) -> SequenceObject<T>;
+    fn get_chain(&self) -> SequenceValueObject<T>;
+    fn generate() -> Self;
 }

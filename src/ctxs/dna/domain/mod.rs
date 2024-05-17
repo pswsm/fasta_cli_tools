@@ -1,13 +1,13 @@
 use anyhow::anyhow;
 
 use crate::ctxs::{
-    fasta::domain::fasta::C_DNA_BASES,
-    shared::domain::{Sequence, SequenceObject},
+    fasta::{application::generate::c_generate_bases, domain::fasta::C_DNA_BASES},
+    shared::domain::{Sequence, SequenceValueObject},
 };
 
 #[derive(Debug, PartialEq, Eq)]
-struct Dna {
-    chain: SequenceObject<char>,
+pub struct Dna {
+    chain: SequenceValueObject<char>,
 }
 
 impl TryFrom<String> for Dna {
@@ -26,8 +26,14 @@ impl Sequence<char> for Dna {
         crate::ctxs::shared::domain::SequenceType::Dna
     }
 
-    fn get_chain(&self) -> SequenceObject<char> {
+    fn get_chain(&self) -> SequenceValueObject<char> {
         self.chain.clone()
+    }
+
+    fn generate() -> Self {
+        Dna {
+            chain: c_generate_bases(300, C_DNA_BASES).unwrap(),
+        }
     }
 }
 
@@ -48,7 +54,7 @@ impl Dna {
 
 #[cfg(test)]
 mod tests {
-    use crate::ctxs::dna::domain::Dna;
+    use crate::ctxs::{dna::domain::Dna, shared::domain::Sequence};
 
     #[test]
     fn try_from_string() {
@@ -66,5 +72,10 @@ mod tests {
             Err(_) => panic!(""),
             _ => unreachable!(),
         };
+    }
+
+    #[test]
+    fn try_generate() {
+        let _: Dna = Dna::generate();
     }
 }
