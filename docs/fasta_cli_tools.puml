@@ -1,0 +1,20 @@
+@startuml fasta_cli_tools
+title Fasta CLI Tools
+
+object Fasta
+object Sequence
+object FastaHeader
+object Protein
+object Aminoacid
+object Codon
+object DNA
+object RNA
+
+Fasta *--> FastaHeader
+Fasta *--> Sequence
+RNA -up-|> Sequence
+DNA -up-|> Sequence
+Protein -up-|> Sequence
+Protein *--> Aminoacid
+Aminoacid *--> Codon
+@enduml

@@ -1,8 +1,8 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-use anyhow::Result;
+use crate::ctxs::{fasta::domain::fasta::Fasta, protein::domain::Protein};
 
-use crate::ctxs::{fasta::domain::fasta::Fasta, protein::domain::protein::Protein};
+use super::error::Generic;
 
 pub struct CommonWriteFormat {
     header: Option<String>,
@@ -28,7 +28,7 @@ impl From<Protein> for CommonWriteFormat {
 }
 
 impl CommonWriteFormat {
-    pub(crate) fn save(&self, file_name: &PathBuf) -> Result<()> {
+    pub(crate) fn save(&self, file_name: &PathBuf) -> Result<(), Generic> {
         let mut output_file: File = File::create(file_name)?;
         if self.header.is_some() {
             output_file.write_all(self.header.as_ref().unwrap().as_bytes())?;

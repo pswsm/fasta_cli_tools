@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
 
-use crate::ctxs::aminoacid::domain::aminoacid::Aminoacid;
+use crate::ctxs::protein::aminoacid::domain::aminoacid::Aminoacid;
 
 lazy_static! {
     /// Creates a vector holding all possible aminoacids.
@@ -94,4 +94,12 @@ lazy_static! {
 /// Select a random `String` from a given `Vector`.
 pub(crate) fn select_rnd_str(string_list: &Vec<String>) -> String {
     String::from(string_list.choose(&mut rand::thread_rng()).unwrap())
+}
+
+/// Select a random `String` from a given `Vector`.
+pub(crate) fn select_rnd_char(char_list: [char; 4]) -> char {
+    char_list
+        .choose(&mut rand::thread_rng())
+        .unwrap()
+        .to_owned()
 }

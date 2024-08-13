@@ -1,0 +1,27 @@
+use std::path::PathBuf;
+
+use textwrap::fill;
+
+use crate::ctxs::{fasta::domain::fasta::Fasta, shared::error::Generic};
+
+use super::view;
+
+/// Formats a .fasta file, represented with the `Fasta` struct.
+pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> Result<String, Generic> {
+    let fasta: Fasta = match view::cat_f(&file) {
+        Ok(contents) => contents,
+        Err(e) => panic!("Could not read file. Error {}", e),
+    };
+    let result: String = String::from("Format OK!");
+    let strip_seq: String = fasta.sequence.to_string().replace('\n', "");
+    let seq: String = fill(&strip_seq, 60);
+    let fmt_fasta: Fasta = Fasta::from((fasta.header.to_string(), seq));
+    let final_fasta: Fasta = match is_upper {
+        true => fmt_fasta.uppercase(),
+        false => fmt_fasta,
+    };
+    final_fasta.save(&out_file)?;
+    Ok(result)
+}
+
+// TODO: Tests

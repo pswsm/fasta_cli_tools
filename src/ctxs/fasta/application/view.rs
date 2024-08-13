@@ -8,7 +8,7 @@ use std::{
     path::Path,
 };
 
-use crate::ctxs::fasta::domain::fasta::Fasta;
+use crate::ctxs::{fasta::domain::fasta::Fasta, shared::error::Generic};
 
 /// Reads files contents and returns them, independently of type.
 macro_rules! read2str {
@@ -22,7 +22,7 @@ macro_rules! read2str {
 }
 
 /// A wrapper function around `cat_f()` that returns a string.
-pub fn cat(file: &Path) -> anyhow::Result<String, anyhow::Error> {
+pub fn cat(file: &Path) -> Result<String, Generic> {
     /* if let Ok(fasta) = cat_f(file) {
         return Ok(fasta.to_string())
     }
@@ -37,7 +37,7 @@ pub fn cat(file: &Path) -> anyhow::Result<String, anyhow::Error> {
 }
 
 /// Parses a file to `Fasta` struct, and returns it.
-pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
+pub fn cat_f(file: &Path) -> Result<Fasta, Generic> {
     let contents: String = read2str!(file);
     let reader_lines: std::str::Lines = contents.lines();
     let reader_lines_copy: std::str::Lines = reader_lines.clone();
@@ -51,7 +51,7 @@ pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
         .filter(|line| !(line.starts_with('>')))
         .collect();
     if sequence.is_empty() {
-        return Err(anyhow::anyhow!("Sequence is empty.").context("The file has an empty sequence"));
+        return Err(Generic::new("Sequence is empty."));
     }
 
     let fasta: Fasta = Fasta::from((header, sequence));
@@ -60,10 +60,10 @@ pub fn cat_f(file: &Path) -> Result<Fasta, anyhow::Error> {
 }
 
 /// Analizes the contents of a DNA or RNA sequence.
-pub fn analize(file: &Path) -> Result<String, anyhow::Error> {
+pub fn analize(file: &Path) -> Result<String, Generic> {
     let fasta: Fasta = match cat_f(file) {
         Ok(seq) => seq,
-        Err(e) => return Err(anyhow::anyhow!("Can't read file. Error: {}", e)),
+        Err(_) => return Err(Generic::new("Can't read file. Error: {}")),
     };
     let t_chars: usize = fasta.sequence.get_chars().count();
     let c_count: usize = fasta.sequence.get_chars().filter(|&c| c == 'c').count();
