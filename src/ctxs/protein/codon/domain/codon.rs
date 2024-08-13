@@ -1,8 +1,8 @@
 use std::fmt::{self, Display};
 
-use anyhow::ensure;
+use crate::ctxs::fasta::domain::fasta::C_RNA_BASES;
 
-use crate::ctxs::{fasta::domain::fasta::C_RNA_BASES, protein::codon::domain::error::CodonError};
+use super::error;
 
 /// Codon Value Object
 pub type CodonValue = [char; 3];
@@ -20,14 +20,13 @@ impl Display for Codon {
 }
 
 impl TryFrom<[char; 3]> for Codon {
-    type Error = anyhow::Error;
+    type Error = error::CodonError;
 
     fn try_from(value: [char; 3]) -> Result<Self, Self::Error> {
         let value_binding = value;
-        ensure!(
-            value_binding.into_iter().all(|c| C_RNA_BASES.contains(&c)),
-            CodonError::InvalidBases
-        );
+        if !value_binding.into_iter().all(|c| C_RNA_BASES.contains(&c)) {
+            return Err(error::CodonError::InvalidBases);
+        }
         Ok(Codon {
             codon: value_binding,
         })

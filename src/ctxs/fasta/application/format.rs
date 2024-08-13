@@ -1,14 +1,13 @@
 use std::path::PathBuf;
 
-use anyhow::Result;
 use textwrap::fill;
 
-use crate::ctxs::fasta::domain::fasta::Fasta;
+use crate::ctxs::{fasta::domain::fasta::Fasta, shared::error::Generic};
 
 use super::view;
 
 /// Formats a .fasta file, represented with the `Fasta` struct.
-pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> Result<String> {
+pub fn format(file: PathBuf, is_upper: bool, out_file: PathBuf) -> Result<String, Generic> {
     let fasta: Fasta = match view::cat_f(&file) {
         Ok(contents) => contents,
         Err(e) => panic!("Could not read file. Error {}", e),

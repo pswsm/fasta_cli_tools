@@ -1,8 +1,9 @@
-use anyhow::anyhow;
-
 use crate::ctxs::{
     fasta::{application::generate::c_generate_bases, domain::fasta::C_RNA_BASES},
-    shared::domain::{Sequence, SequenceValueObject},
+    shared::{
+        domain::{Sequence, SequenceValueObject},
+        error::Generic,
+    },
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -11,9 +12,9 @@ struct Rna {
 }
 
 impl TryFrom<String> for Rna {
-    type Error = anyhow::Error;
+    type Error = Generic;
 
-    fn try_from(value: String) -> Result<Rna, anyhow::Error> {
+    fn try_from(value: String) -> Result<Rna, Generic> {
         Self::ensure_dna(&value)?;
         Ok(Rna {
             chain: value.chars().collect::<Vec<char>>(),
@@ -38,14 +39,11 @@ impl Sequence<char> for Rna {
 }
 
 impl Rna {
-    fn ensure_dna(value: &str) -> Result<bool, anyhow::Error> {
+    fn ensure_dna(value: &str) -> Result<bool, Generic> {
         // TODO: better error ensure
         for base in value.chars() {
             if !(C_RNA_BASES.contains(&base)) {
-                return Err(anyhow!(format!(
-                    "Expected {:?}, found {}",
-                    C_RNA_BASES, base
-                )));
+                return Err(Generic::new("stop crying"));
             }
         }
         Ok(true)
