@@ -1,7 +1,5 @@
 use std::fmt::Display;
 
-use anyhow::ensure;
-
 use crate::ctxs::{
     protein::{aminoacid::domain::errors::AminoacidErrors, codon::domain::codon::Codon},
     shared::utils::AMINOACID_TABLE,
@@ -52,7 +50,7 @@ impl From<(AminoacidValue, Vec<[char; 3]>)> for Aminoacid {
 /// This is implememntaion is meant to be the main one to create aminoacids,
 /// since it retrieves them from the aminoacid table and checks if it exists.
 impl TryFrom<[char; 3]> for Aminoacid {
-    type Error = anyhow::Error;
+    type Error = AminoacidErrors;
     fn try_from(value: [char; 3]) -> Result<Self, Self::Error> {
         let codon: Codon = Codon::try_from(value).unwrap();
         let aminoacid: &Vec<Aminoacid> = &AMINOACID_TABLE
@@ -60,10 +58,9 @@ impl TryFrom<[char; 3]> for Aminoacid {
             .into_iter()
             .filter(|aminoacid| aminoacid.codons.contains(&codon))
             .collect::<Vec<Aminoacid>>();
-        ensure!(
-            aminoacid.len() > 0,
-            AminoacidErrors::NonExistingAminoacidError
-        );
+        if !aminoacid.len() > 0 {
+            return Err(AminoacidErrors::NonExistingAminoacidError);
+        };
         Ok(Aminoacid {
             aminoacid: aminoacid[0].aminoacid,
             codons: aminoacid[0].codons.clone(),
