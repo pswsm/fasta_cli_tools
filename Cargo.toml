@@ -6,14 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.4.8", features = ['derive'] }
-anyhow = "1.0.65"
+clap = { version = "4.5.15", features = ['derive'] }
 rand = "0.8.5"
-textwrap = "0.15"
-num_cpus = "1.13.1"
-lazy_static = "1.4.0"
+textwrap = "0.16.1"
+lazy_static = "1.5.0"
 rayon = "1.10.0"
-thiserror = "1.0"
+sequence_domain = "0.1.0"
+thiserror = "1.0.63"
 
 [profile.release]
 lto = true
