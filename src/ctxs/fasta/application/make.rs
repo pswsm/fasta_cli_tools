@@ -1,5 +1,4 @@
 use anyhow::Result;
-use rayon::prelude::*;
 use std::path::PathBuf;
 
 use crate::{
@@ -41,12 +40,16 @@ pub fn generate(bases: usize, file: PathBuf, is_rna: bool) -> Result<String> {
 
 /// Generates a random string chain given four different slices. Multithreaded if num_threads is bigger than one I guess
 fn generate_bases(num_bases: usize, bases: [&str; 4]) -> Result<Vec<String>> {
-    let base_list: Vec<String> = bases.iter().map(|b| b.to_string()).collect();
-    let ray_seq: Vec<_> = (0..=num_bases)
-        .into_par_iter()
-        .map(|_| select_rnd_str(&base_list))
-        .collect();
-    Ok(ray_seq)
+    let (tx, rx) = std::sync::mpsc::channel();
+    let custom_par: Vec<String> = {
+        for _ in 0..num_bases {
+            let local_tx = tx.clone();
+            let local_base_list: Vec<String> = bases.iter().map(|b| b.to_string()).collect();
+            std::thread::spawn(move || local_tx.send(select_rnd_str(&local_base_list)));
+        }
+        rx.try_iter().collect()
+    };
+    Ok(custom_par)
 }
 
 pub fn operate_on_chain(
